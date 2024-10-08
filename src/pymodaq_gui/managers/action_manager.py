@@ -13,12 +13,17 @@ from pathlib import Path
 
 def create_icon(icon_name: str):
     icon = QtGui.QIcon()
-    if Path(icon_name).is_file():
+    if Path(icon_name).is_file(): # Test if icon is in path
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal,
                        QtGui.QIcon.Off)
     else:
-        icon.addPixmap(QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png"), QtGui.QIcon.Normal,
-                       QtGui.QIcon.Off)
+        pixmap = QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png") # Test if icon is in pymodaq's library
+        if pixmap.isNull(): 
+            if hasattr(QtGui.QIcon.ThemeIcon,icon_name): # Test if icon is in Qt's library
+                icon = QtGui.QIcon.fromTheme(getattr(QtGui.QIcon.ThemeIcon,icon_name))
+        else:
+            icon.addPixmap(QtGui.QPixmap(pixmap), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
     return icon
 
 
