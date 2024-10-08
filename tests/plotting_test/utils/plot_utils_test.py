@@ -126,3 +126,13 @@ class TestInfoFromROI:
         # roi_info refers to the index of the numpy data (line, column, ...)
         assert roi_info.roi_class == RectROI
 
+    def test_get_repr(self, qtbot):
+        pos = [-30, 65]
+        size = [78, 5]
+        color = (34, 78, 23)
+        roi = RectROI(pos=pos, size=size)
+        roi.setPen(color)
+        roi_info = RoiInfo.info_from_rect_roi(roi)
+
+        print(roi_info)
+
