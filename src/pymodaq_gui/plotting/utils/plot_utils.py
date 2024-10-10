@@ -556,6 +556,9 @@ class RoiInfo:
             self.origin += Point((self.size[0] / 2, self.size[1] / 2))
             self.centered = True
 
+    def __repr__(self):
+        return f'Origin: {self.origin}, Size: {self.size}, Centered: {self.centered}'
+
     def to_slices(self) -> IterableType[slice]:
         """Get slices to be used directly to slice DataWithAxes"""
         if issubclass(self.roi_class, pgROI):
