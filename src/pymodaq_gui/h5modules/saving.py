@@ -97,7 +97,8 @@ class H5SaverBase(H5SaverLowLevel, ParameterManager):
         {'title': 'Save type:', 'name': 'save_type', 'type': 'list', 'limits': SaveType.names(),
          'readonly': True},
     ] + dashboard_submodules_params + \
-        [{'title': 'Backend:', 'name': 'backend', 'type': 'group', 'children': [
+        [
+            {'title': 'Backend:', 'name': 'backend', 'type': 'group', 'children': [
             {'title': 'Backend type:', 'name': 'backend_type', 'type': 'list',
              'limits': backends_available, 'readonly': True},
             {'title': 'HSDS Server:', 'name': 'hsds_options', 'type': 'group', 'visible': False,
@@ -110,7 +111,6 @@ class H5SaverBase(H5SaverLowLevel, ParameterManager):
                     'value': config('data_saving', 'hsds', 'pwd'), 'readonly': False},
             ]},
         ]},
-
         {'title': 'custom_name?:', 'name': 'custom_name', 'type': 'bool', 'default': False,
          'value': False},
         {'title': 'show file content?', 'name': 'show_file', 'type': 'bool_push', 'default': False,
