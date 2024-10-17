@@ -28,7 +28,7 @@ class ParameterTreeWidget(ActionManager):
         self.widget.header = self.tree.header  # for back-compatibility, widget behave a bit like a ParameterTree
         self.widget.listAllItems = self.tree.listAllItems  # for back-compatibility
 
-        self.tree.setMinimumWidth(150)
+        #self.tree.setMinimumWidth(150)
         #self.tree.setMinimumHeight(300)
         
         # Making the buttons
@@ -100,6 +100,7 @@ class ParameterManager:
         self.settings = Parameter.create(name=settings_name, type='group', children=self.params,
                                          showTop=False)  # create a Parameter
         # object containing the settings defined in the preamble
+        self._settings_tree.tree.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
 
     @property
     def settings_tree(self):
