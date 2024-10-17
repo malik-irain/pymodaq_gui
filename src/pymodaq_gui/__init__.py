@@ -9,7 +9,8 @@ import warnings
 
 def check_qt_presence():
     try:
-        from qtpy import QtWidgets
+        import qtpy
+
     except ImportError as e:
         msg = f"\n\n" \
               f"****************************************************************************************\n" \
