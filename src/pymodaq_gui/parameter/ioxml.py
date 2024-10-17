@@ -467,6 +467,8 @@ def set_txt_from_elt(el, param_dict):
         elif param_type == 'action':
             if val_text == 'None':
                 param_value = None
+            else:
+                param_value = eval(val_text)
         else:
             param_value = val_text
         param_dict.update(dict(value=param_value))
