@@ -96,7 +96,7 @@ class TestInfoFromROI:
         assert isinstance(roi_info.origin, Point)
         assert roi_info.origin == origin
 
-    def test_create_from_linear_roi(self):
+    def test_create_from_linear_roi(self, qtbot):
         pos_linear = [-30, 65]
         linear_color = (34, 78, 23)
         linear_roi = LinearROI(pos=pos_linear)

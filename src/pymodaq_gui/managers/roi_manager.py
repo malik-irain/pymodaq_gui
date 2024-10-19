@@ -172,6 +172,19 @@ class LinearROI(pgLinearROI):
         self.index = index
         self.sigRegionChangeFinished.connect(self.emit_index_signal)
 
+        self._menu = QtWidgets.QMenu()
+        self._menu.addAction('Copy ROI to clipboard', self.copy_clipboard)
+        self.sigRegionChangeFinished.connect(self.emit_index_signal)
+        self._clipboard = QtGui.QGuiApplication.clipboard()
+
+    def copy_clipboard(self):
+        info = plot_utils.RoiInfo.info_from_linear_roi(self)
+        self._clipboard.setText(str(info.to_slices()))
+
+    def contextMenuEvent(self, event):
+        if self._menu is not None:
+            self._menu.exec(event.screenPos())
+
     def pos(self) -> Tuple[float, float]:
         return self.getRegion()
 

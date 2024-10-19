@@ -576,7 +576,7 @@ class RoiInfo:
                         )
         elif issubclass(self.roi_class, pgLinearROI):
             if self.centered:
-                return (slice(int(self.origin[0] - self.size[0] / 2),
-                              int(self.origin[0] + self.size[0] / 2)),)
+                return (slice((self.origin[0] - self.size[0] / 2),
+                              (self.origin[0] + self.size[0] / 2)),)
             else:
-                return (slice(int(self.origin[0]), int(self.origin[0] + self.size[0])),)
+                return (slice((self.origin[0]), (self.origin[0] + self.size[0])),)
