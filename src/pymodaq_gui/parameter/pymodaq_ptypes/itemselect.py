@@ -54,8 +54,8 @@ class ItemSelect(QtWidgets.QListWidget):
             Function to select item. The selection depends if the item uses checkbox or not.
         """        
         if self.hasCheckbox:
-            item.setCheckState(QtCore.Qt.Checked if item.checkState() == QtCore.Qt.Unchecked
-                               else QtCore.Qt.Unchecked)
+            item.setCheckState(QtCore.Qt.CheckState(int(2*bool(not item.checkState().value))))
+
 
     def get_value(self):
         """
@@ -71,7 +71,7 @@ class ItemSelect(QtWidgets.QListWidget):
             # Clean up list with non existing entries      
             [self.selItems.remove(item) for item in self.selItems if item not in allitems]        
             for item in self.all_items():
-                if item.checkState() != QtCore.Qt.Unchecked: # Item is selected
+                if item.checkState() != QtCore.Qt.CheckState(0): # Item is selected
                     if item.text() not in self.selItems: # if item not in list then add it
                         self.selItems.append(item.text())
                 else: # Item is not selected
@@ -101,7 +101,8 @@ class ItemSelect(QtWidgets.QListWidget):
             Function to select item. The selection depends if the item uses checkbox or not.
         """        
         if self.hasCheckbox:
-            item.setCheckState(QtCore.Qt.Checked if doSelect else QtCore.Qt.Unchecked)  # 2=QtCore.Qt.Checked, 0=QtCore.Qt.Unchecked
+            item.setCheckState(QtCore.Qt.CheckState(int(2*doSelect)))  # 2=QtCore.Qt.Checked, 0=QtCore.Qt.Unchecked
+
         else:
             item.setSelected(doSelect)
 
