@@ -122,7 +122,10 @@ class ParameterEx(ParameterManager):
 
 
 def main():
-    app = QtWidgets.QApplication(sys.argv)
+    from pymodaq_gui.utils.utils import mkQApp
+
+    app = mkQApp('Parameters')
+
     ptree = ParameterEx()
     ptree.settings_tree.show()
     ptree.settings.child('itemss', 'itemsbis').setValue(dict(all_items=['item1', 'item2', 'item3'],
@@ -130,7 +133,8 @@ def main():
 
     ptree.settings.child('itemss', 'itemsbis').setValue(dict(all_items=['item1', 'item2', 'item3'],
                                                              selected=['item1', 'item3']))
-    sys.exit(app.exec_())
+
+    app.exec()
 
 
 if __name__ == '__main__':

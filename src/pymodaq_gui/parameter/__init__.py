@@ -9,5 +9,5 @@ class ParameterTree(ParameterTree):
         super().__init__(*args, **kwargs)
 
         self.header().setVisible(True)
-        self.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.header().setMinimumSectionSize(150)
+        self.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        #self.header().setMinimumSectionSize(150)

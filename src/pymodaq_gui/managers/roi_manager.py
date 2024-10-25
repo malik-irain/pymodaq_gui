@@ -23,7 +23,7 @@ from pymodaq_utils.utils import plot_colors
 from pymodaq_utils.logger import get_module_name, set_logger
 from pymodaq_gui.config import get_set_roi_path
 from pymodaq_gui.utils import select_file
-
+from pymodaq_gui.plotting.utils import plot_utils
 
 import numpy as np
 from pathlib import Path
@@ -92,7 +92,9 @@ class ROI(pgROI):
         self.index = index
         self._menu = QtWidgets.QMenu()
         self._menu.addAction('Set ROI positions', self.set_positions)
+        self._menu.addAction('Copy ROI to clipboard', self.copy_clipboard)
         self.sigRegionChangeFinished.connect(self.emit_index_signal)
+        self._clipboard = QtGui.QGuiApplication.clipboard()
 
     def emit_index_signal(self):
         self.index_signal.emit(self.index)
@@ -116,6 +118,10 @@ class ROI(pgROI):
             self.setSize((settings['size', 'width'], settings['size', 'height']))
             self.setPos((settings['position', 'x0'] - settings['size', 'width'] / 2,
                          settings['position', 'y0'] - settings['size', 'height'] / 2))
+
+    def copy_clipboard(self):
+        info = plot_utils.RoiInfo.info_from_rect_roi(self)
+        self._clipboard.setText(str(info.to_slices()))
 
     def contextMenuEvent(self, event):
         if self._menu is not None:
@@ -165,6 +171,19 @@ class LinearROI(pgLinearROI):
         self.name = name
         self.index = index
         self.sigRegionChangeFinished.connect(self.emit_index_signal)
+
+        self._menu = QtWidgets.QMenu()
+        self._menu.addAction('Copy ROI to clipboard', self.copy_clipboard)
+        self.sigRegionChangeFinished.connect(self.emit_index_signal)
+        self._clipboard = QtGui.QGuiApplication.clipboard()
+
+    def copy_clipboard(self):
+        info = plot_utils.RoiInfo.info_from_linear_roi(self)
+        self._clipboard.setText(str(info.to_slices()))
+
+    def contextMenuEvent(self, event):
+        if self._menu is not None:
+            self._menu.exec(event.screenPos())
 
     def pos(self) -> Tuple[float, float]:
         return self.getRegion()
