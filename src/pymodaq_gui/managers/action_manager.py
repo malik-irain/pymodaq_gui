@@ -47,6 +47,9 @@ class QAction(QAction):
     def set_icon(self, icon_name: str):
         self.setIcon(create_icon(icon_name))
 
+    def __repr__(self):
+        return f'QAction {self.text()}'
+
 
 def addaction(name: str = '', icon_name: str = '', tip='', checkable=False, checked=False,
               slot: Callable = None, toolbar: QtWidgets.QToolBar = None,
@@ -237,7 +240,8 @@ class ActionManager:
                                               visible=visible, shortcut=shortcut, enabled=enabled)
 
     def add_widget(self, short_name, klass: Union[str, QtWidgets.QWidget], *args, tip='',
-                   toolbar: QtWidgets.QToolBar = None, visible=True, signal_str=None, slot: Callable=None, **kwargs):
+                   toolbar: QtWidgets.QToolBar = None, visible=True, signal_str=None,
+                   slot: Callable=None, **kwargs):
         """Create and add a widget to a toolbar
 
         Parameters
