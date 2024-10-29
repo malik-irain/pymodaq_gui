@@ -35,6 +35,7 @@
     <file>Icon_Library/autoscale.png</file>
     <file>Icon_Library/b_icon.png</file>
     <file>Icon_Library/back.png</file>
+    <file>Icon_Library/back-and-forth.png</file>    
     <file>Icon_Library/bg_icon.png</file>
     <file>Icon_Library/Browse_Dir_Path.png</file>
     <file>Icon_Library/Calculator.png</file>
@@ -58,6 +59,7 @@
     <file>Icon_Library/DeleteLayer.png</file>
     <file>Icon_Library/download.png</file>
     <file>Icon_Library/download2.png</file>
+    <file>Icon_Library/EditFile.png</file>
     <file>Icon_Library/EditOpen.png</file>
     <file>Icon_Library/EditRedo.png</file>
     <file>Icon_Library/EditUndo.png</file>
@@ -74,6 +76,7 @@
     <file>Icon_Library/ExpandAll.png</file>
     <file>Icon_Library/ExpandAll_32.png</file>
     <file>Icon_Library/fan.png</file>
+    <file>Icon_Library/flip.png</file>    
     <file>Icon_Library/FFT.png</file>
     <file>Icon_Library/filter2.png</file>
     <file>Icon_Library/g_icon.png</file>
@@ -195,6 +198,8 @@
     <file>Icon_Library/SelectPolygon.png</file>
     <file>Icon_Library/sequence.png</file>
     <file>Icon_Library/sequence2.png</file>
+    <file>Icon_Library/show.png</file>    
+    <file>Icon_Library/shuffle.png</file>    
     <file>Icon_Library/Snap&amp;Save.png</file>
     <file>Icon_Library/snap.png</file>
     <file>Icon_Library/Snapshot.png</file>
@@ -215,6 +220,7 @@
     <file>Icon_Library/surfacePlot.png</file>
     <file>Icon_Library/tree.png</file>
     <file>Icon_Library/updateTree.png</file>
+    <file>Icon_Library/unshow.png</file>    
     <file>Icon_Library/utility_small.png</file>
     <file>Icon_Library/utility2.png</file>
     <file>Icon_Library/vector.png</file>
