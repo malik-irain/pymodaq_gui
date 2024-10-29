@@ -1,7 +1,7 @@
 PyMoDAQ GUI
 ###########
 
-.. image:: https://img.shields.io/pypi/v/_gui.svg
+.. image:: https://img.shields.io/pypi/v/pymodaq_gui.svg
    :target: https://pypi.org/project/pymodaq_gui/
    :alt: Latest Version
 
@@ -9,7 +9,7 @@ PyMoDAQ GUI
    :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/PyMoDAQ/pymodaq_gui/branch/0.0.x_dev/graph/badge.svg?token=IQNJRCQDM2
+.. image:: https://codecov.io/gh/PyMoDAQ/pymodaq_gui/branch/5.0.x_dev/graph/badge.svg?token=IQNJRCQDM2
     :target: https://codecov.io/gh/PyMoDAQ/PyMoDAQ
 
 ====== ========== ======= ======
