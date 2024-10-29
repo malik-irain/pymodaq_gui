@@ -345,12 +345,12 @@ class ActionManager:
         return action_name in self._actions
 
     @property
-    def toolbar(self):
+    def toolbar(self) -> QtWidgets.QToolBar:
         """Get the default toolbar"""
         return self._toolbar
 
     @property
-    def menu(self):
+    def menu(self) -> QtWidgets.QMenuBar:
         """Get the default menu"""
         return self._menu
 
