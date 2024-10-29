@@ -71,7 +71,7 @@ class ItemSelect(QtWidgets.QListWidget):
             # Clean up list with non existing entries      
             [self.selItems.remove(item) for item in self.selItems if item not in allitems]        
             for item in self.all_items():
-                if item.checkState() != 0: # Item is selected
+                if item.checkState() != QtCore.Qt.Unchecked: # Item is selected
                     if item.text() not in self.selItems: # if item not in list then add it
                         self.selItems.append(item.text())
                 else: # Item is not selected
