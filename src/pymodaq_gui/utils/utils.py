@@ -1,3 +1,4 @@
+import os
 import sys
 
 from qtpy.QtCore import QObject, Signal, QEvent, QBuffer, QIODevice, Qt
@@ -137,7 +138,7 @@ def start_qapplication() -> QtWidgets.QApplication:
     app = QtWidgets.QApplication(sys.argv)
     if config('style', 'darkstyle'):
         import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.DarkPalette))
+        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api=os.environ['QT_API']))
     return app
 
 
@@ -145,13 +146,10 @@ def mkQApp(name: str):
     app = mkQApppg(name)
     if config('style', 'darkstyle'):
         import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.DarkPalette))
+        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api=os.environ['QT_API']))
     return app
 
 
 def exec():
-    app = mkQApp()
-    if config('style', 'darkstyle'):
-        import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.DarkPalette))
+    app = mkQApp('a name')
     return app.exec() if hasattr(app, 'exec') else app.exec_()

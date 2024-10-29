@@ -96,7 +96,7 @@ class TestInfoFromROI:
         assert isinstance(roi_info.origin, Point)
         assert roi_info.origin == origin
 
-    def test_create_from_linear_roi(self):
+    def test_create_from_linear_roi(self, qtbot):
         pos_linear = [-30, 65]
         linear_color = (34, 78, 23)
         linear_roi = LinearROI(pos=pos_linear)
@@ -125,4 +125,14 @@ class TestInfoFromROI:
         assert roi_info.size[1] == pytest.approx(size[0])  # ROI takes argument as (x, y) while
         # roi_info refers to the index of the numpy data (line, column, ...)
         assert roi_info.roi_class == RectROI
+
+    def test_get_repr(self, qtbot):
+        pos = [-30, 65]
+        size = [78, 5]
+        color = (34, 78, 23)
+        roi = RectROI(pos=pos, size=size)
+        roi.setPen(color)
+        roi_info = RoiInfo.info_from_rect_roi(roi)
+
+        print(roi_info)
 
