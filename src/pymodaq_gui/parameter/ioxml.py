@@ -42,7 +42,7 @@ def walk_parameters_to_xml(parent_elt=None, param=None):
         opts = dict_from_param(param)
         parent_elt = ET.Element(param.name(), **opts)
         param_type = str(param.type())
-        if 'group' not in param_type:  # covers 'group', custom 'groupmove', 'groupai' ...
+        if 'value' in param.opts:
             add_text_to_elt(parent_elt, param)
 
     params_list = param.children()
@@ -52,9 +52,11 @@ def walk_parameters_to_xml(parent_elt=None, param=None):
         param_type = str(param.type())        
         if param.hasChildren():
             walk_parameters_to_xml(elt, param)
-        add_text_to_elt(elt, param)
+        if 'value' in param.opts:
+            add_text_to_elt(elt, param)
 
         parent_elt.append(elt)
+
     return parent_elt
 
 
@@ -190,6 +192,10 @@ def dict_from_param(param):
     if 'movelist' in param.opts:
         movelist = str(param.opts['movelist'])
         opts.update(dict(movelist=movelist))
+
+    if 'label' in param.opts:
+        label = str(param.opts['label'])
+        opts.update(dict(label=label))
 
     if 'show_pb' in param.opts:
         if param.opts['show_pb']:
