@@ -282,6 +282,10 @@ def elt_to_dict(el):
         addText = str(el.get('addText'))
         param.update(dict(addText=addText))
 
+    if 'label' in el.attrib.keys():
+        label = str(el.get('label'))
+        param.update(dict(label=label))
+
     # if 'limits' in el.attrib.keys():
     #     try:
     #         values = list(eval(el.get('limits')))  # make sure the evaluated values are returned as list (in case another
