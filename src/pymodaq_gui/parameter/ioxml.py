@@ -41,7 +41,6 @@ def walk_parameters_to_xml(parent_elt=None, param=None):
     if parent_elt is None:
         opts = dict_from_param(param)
         parent_elt = ET.Element(param.name(), **opts)
-        param_type = str(param.type())
         if 'value' in param.opts:
             add_text_to_elt(parent_elt, param)
 
@@ -49,7 +48,6 @@ def walk_parameters_to_xml(parent_elt=None, param=None):
     for param in params_list:
         opts = dict_from_param(param)
         elt = ET.Element(param.name(), **opts)
-        param_type = str(param.type())        
         if param.hasChildren():
             walk_parameters_to_xml(elt, param)
         if 'value' in param.opts:
@@ -397,20 +395,12 @@ def walk_xml_to_parameter(params=[], XML_elt=None):
             raise TypeError('not valid XML element')
 
         if len(XML_elt) == 0:
-            param_dict = elt_to_dict(XML_elt)
-            param_type = XML_elt.get('type')
-
-            if 'group' not in param_type:  # covers 'group', custom 'groupmove'...
-                set_txt_from_elt(XML_elt, param_dict)
+            param_dict = set_dict_from_el(XML_elt)
             params.append(param_dict)
 
         for el in XML_elt:
-            param_dict = elt_to_dict(el)
-            param_type = el.get('type')
-
-            if 'group' not in param_type:  # covers 'group', custom 'groupmove'...
-                set_txt_from_elt(el, param_dict)            
-            if param_type not in PARAM_TYPES:
+            param_dict = set_dict_from_el(el)           
+            if param_dict['type'] not in PARAM_TYPES:
                 param_dict['type'] = 'group'  # in case the custom group has been defined somewhere but not
                 # registered again in this session
             if len(el) == 0:
@@ -418,15 +408,22 @@ def walk_xml_to_parameter(params=[], XML_elt=None):
             else:
                 subparams = []
                 children = walk_xml_to_parameter(subparams, el)
-            param_dict['children'] = children
-
-            param_dict['name'] = el.tag
-
+            param_dict['children'] = children            
             params.append(param_dict)
+
     except Exception as e:  # to be able to debug when there's an issue
         raise e
     return params
 
+def set_dict_from_el(el):
+    """Convert an element into a dict
+    ----------
+    el: xml element
+    param_dict: dictionnary from which the parameter will be constructed
+    """
+    param_dict = elt_to_dict(el)
+    set_txt_from_elt(el, param_dict)  
+    return param_dict          
 
 def set_txt_from_elt(el, param_dict):
     """
@@ -438,7 +435,8 @@ def set_txt_from_elt(el, param_dict):
 
     """
     val_text = el.text
-    param_type = el.get('type')
+    param_type = param_dict['type']
+    # param_type = el.get('type') # Redundancy (param_dict already has this attribute)
     if val_text is not None:
         if param_type == 'float':
             param_value = float(val_text)
