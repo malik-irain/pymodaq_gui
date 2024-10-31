@@ -166,14 +166,30 @@ def iter_children(param, childlist=[]):
     return childlist
 
 
-def iter_children_params(param, childlist=[]):
+def iter_children_params(param, childlist=[], filter_type=[], filter_name=[]):
     """Get a list of parameters under a given Parameter
+        | Returns all children parameters.
 
+        =============== ================================= ====================================
+        **Parameters**   **Type**                           **Description**
+        *param*          instance of pyqtgraph parameter    the root node to be coursed
+        *childlist*      list                               the child list recetion structure
+        *filter_type*      list                             filter parameter sharing those types from output
+        *filter_name*      list                             filter parameter sharing those names from output
+        =============== ================================= ====================================
+
+        Returns
+        -------
+        childlist : parameter list
+            The list of the children from the given node.
     """
     for child in param.children():
-        childlist.append(child)
+        if child.type() in filter_type or child.name() in filter_name:
+            pass
+        else:
+            childlist.append(child)
         if child.hasChildren():
-            childlist.extend(iter_children_params(child, []))
+            childlist.extend(iter_children_params(child, [], filter_type, filter_name))
     return childlist
 
 
