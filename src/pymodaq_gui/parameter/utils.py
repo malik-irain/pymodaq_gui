@@ -166,7 +166,7 @@ def iter_children(param, childlist=[]):
     return childlist
 
 
-def iter_children_params(param, childlist=[], filter_type=[], filter_name=[]):
+def iter_children_params(param, childlist=[], filter_type=[], filter_name=[], selectFilter=False):
     """Get a list of parameters under a given Parameter
         | Returns all children parameters.
 
@@ -174,8 +174,10 @@ def iter_children_params(param, childlist=[], filter_type=[], filter_name=[]):
         **Parameters**   **Type**                           **Description**
         *param*          instance of pyqtgraph parameter    the root node to be coursed
         *childlist*      list                               the child list recetion structure
-        *filter_type*      list                             filter parameter sharing those types from output
-        *filter_name*      list                             filter parameter sharing those names from output
+        *filter_type*    list                               filter parameter sharing those types from output
+        *filter_name*    list                               filter parameter sharing those names from output
+        *selectFilter*   bool                               if True, add filtered parameters to output list
+
         =============== ================================= ====================================
 
         Returns
@@ -184,10 +186,13 @@ def iter_children_params(param, childlist=[], filter_type=[], filter_name=[]):
             The list of the children from the given node.
     """
     for child in param.children():
-        if child.type() in filter_type or child.name() in filter_name:
-            pass
+        isFiltered = child.type() in filter_type or child.name() in filter_name
+        if isFiltered:
+            if selectFilter:
+                childlist.append(child)
         else:
             childlist.append(child)
+        
         if child.hasChildren():
             childlist.extend(iter_children_params(child, [], filter_type, filter_name))
     return childlist
