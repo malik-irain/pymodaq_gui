@@ -187,14 +187,12 @@ def iter_children_params(param, childlist=[], filter_type=[], filter_name=[], se
     """
     for child in param.children():
         isFiltered = child.type() in filter_type or child.name() in filter_name
-        if isFiltered:
-            if selectFilter:
-                childlist.append(child)
-        else:
+        addSelectChild = selectFilter and isFiltered
+        addNonSelectChild = not selectFilter and not isFiltered
+        if addSelectChild or addNonSelectChild:
             childlist.append(child)
-        
         if child.hasChildren():
-            childlist.extend(iter_children_params(child, [], filter_type, filter_name))
+            iter_children_params(child, childlist, filter_type, filter_name, selectFilter)
     return childlist
 
 
