@@ -64,10 +64,20 @@ def test_iter_children_params():
     assert all([p.type() != 'group' for p in param_list])
     param_list = putils.iter_children_params(settings,childlist=[],filter_name=['axis'])
     assert all([p.name() != 'axis' for p in param_list])
-    param_list = putils.iter_children_params(settings,childlist=[],filter_name=['axis'],selectFilter=True)
+    param_list = putils.iter_children_params(settings,childlist=[],filter_name=['axis'],select_filter=True)
     assert all([p.name() == 'axis' for p in param_list])
-    param_list = putils.iter_children_params(settings,childlist=[],filter_type=['group'],selectFilter=True)
+    param_list = putils.iter_children_params(settings,childlist=[],filter_type=['group'],select_filter=True)
     assert all([p.type() == 'group' for p in param_list])
+
+def test_iter_children_attributes():
+    settings = Parameter.create(name='settings', type='group', children=params)
+    param_name = putils.iter_children_params(settings, childlist=[], output_type='name')
+    param_type = putils.iter_children_params(settings, childlist=[], output_type='type')
+    param_list = putils.iter_children_params(settings, childlist=[])
+    for p_name,p_type,p in zip(param_name,param_type,param_list):
+        assert p_name == p.name()      
+        assert p_type == p.type()        
+
 
 def test_get_param_path():
     settings = Parameter.create(name='settings', type='group', children=params)
