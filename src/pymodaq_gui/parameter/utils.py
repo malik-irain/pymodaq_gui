@@ -143,16 +143,20 @@ def compareValuesParameter(param1:Parameter,param2:Parameter,)-> bool:
     """    
     return getValues(param1) == getValues(param2)    
 
-def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_filter=False):
+def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_filter=False)-> list:
 
     """
-    Old instance of iter_children_params
+    Get a list of parameters' name under a given Parameter (see iter_children_params)
+
+    Returns
+    -------
+    list
+        The list of the children name from the given node.       
     """
-    DeprecationWarning('iter_children is obsolete since pymodaq_5.0.0 and will soon be removed, now use iter_children_params with output_type=\'name\'')
     return iter_children_params(param, childlist=[], output_type='name', filter_type=(), filter_name=(), select_filter=False)
 
 
-def iter_children_params(param, childlist=[], output_type=None, filter_type=(), filter_name=(), select_filter=False):
+def iter_children_params(param, childlist=[], output_type=None, filter_type=(), filter_name=(), select_filter=False)-> list:
     """
     Get a list of parameters under a given Parameter.
 
