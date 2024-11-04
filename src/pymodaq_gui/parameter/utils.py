@@ -153,7 +153,7 @@ def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_fi
     list
         The list of the children name from the given node.       
     """
-    return iter_children_params(param, childlist=[], output_type='name', filter_type=(), filter_name=(), select_filter=False)
+    return iter_children_params(param, childlist=childlist, output_type='name', filter_type=(), filter_name=(), select_filter=False)
 
 
 def iter_children_params(param, childlist=[], output_type=None, filter_type=(), filter_name=(), select_filter=False)-> list:
