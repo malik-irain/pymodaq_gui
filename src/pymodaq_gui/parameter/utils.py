@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from pymodaq_utils.utils import find_keys_from_val
 from pymodaq_data.serialize.factory import SerializableFactory, SerializableBase
 from pymodaq_gui.parameter import ioxml
-if TYPE_CHECKING:
-    from pymodaq_gui.parameter import Parameter
+
+from pymodaq_gui.parameter import Parameter
 
 ser_factory = SerializableFactory()
 
@@ -50,6 +50,7 @@ class ParameterWithPath(SerializableBase):
         param_as_xml = ioxml.parameter_to_xml_string(param.parameter)
         bytes_string += ser_factory.get_apply_serializer(path)
         bytes_string += ser_factory.get_apply_serializer(param_as_xml)
+        return bytes_string
 
     @classmethod
     def deserialize(cls, bytes_str: bytes) -> Tuple[Any, bytes]:
@@ -135,8 +136,10 @@ def getValues(param:Parameter,) -> OrderedDict:
     """    
     return param.getValues()
 
-def compareParameters(param1:Parameter,param2:Parameter,opts:list=[])-> bool:  
-    """Compare the structure and the opts of two parameters with their children, return True if structure and all opts are identical
+
+def compareParameters(param1:Parameter, param2:Parameter, opts: list = [])-> bool:
+    """Compare the structure and the opts of two parameters with their children,
+     return True if structure and all opts are identical
         Parameters
         ----------
         param1: Parameter
