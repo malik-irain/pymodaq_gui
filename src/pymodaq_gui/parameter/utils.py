@@ -143,37 +143,61 @@ def compareValuesParameter(param1:Parameter,param2:Parameter,)-> bool:
     """    
     return getValues(param1) == getValues(param2)    
 
-def iter_children(param, childlist=[]):
-    """Get a list of parameters name under a given Parameter
-        | Returns all childrens names.
-
-        =============== ================================= ====================================
-        **Parameters**   **Type**                           **Description**
-        *param*          instance of pyqtgraph parameter    the root node to be coursed
-        *childlist*      list                               the child list recetion structure
-        =============== ================================= ====================================
-
-        Returns
-        -------
-        childlist : parameter list
-            The list of the children from the given node.
-    """
-    for child in param.children():
-        childlist.append(child.name())
-        if child.hasChildren():
-        # if 'group' in child.type():
-            childlist.extend(iter_children(child, []))
-    return childlist
-
-
-def iter_children_params(param, childlist=[]):
-    """Get a list of parameters under a given Parameter
+def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_filter=False)-> list:
 
     """
+    Get a list of parameters' name under a given Parameter (see iter_children_params)
+
+    Returns
+    -------
+    list
+        The list of the children name from the given node.       
+    """
+    return iter_children_params(param, childlist=childlist, output_type='name', filter_type=(), filter_name=(), select_filter=False)
+
+
+def iter_children_params(param, childlist=[], output_type=None, filter_type=(), filter_name=(), select_filter=False)-> list:
+    """
+    Get a list of parameters under a given Parameter.
+
+    Parameters
+    ----------
+    param : Parameter (pyqtgraph)
+        the root node to be coursed
+    childlist: list
+        the child/output list
+    output_type: str
+        the attribute of parameter that will be added to the output list
+    filter_type: list
+        filter children sharing those types
+    filter_name: list
+        filter children sharing those names
+    select_filter: bool
+        if True, add filtered parameters to output list. 
+        if False (default), add non-filtered parameter to output list.
+
+    Returns
+    -------
+    list
+        The list of the children from the given node.    
+    """
+
     for child in param.children():
-        childlist.append(child)
+        # XNOR Gate        
+        is_filtered = child.type() in filter_type or child.name() in filter_name
+        add_selected_child = select_filter and is_filtered
+        add_notselected_child = not select_filter and not is_filtered
+        if add_selected_child or add_notselected_child:            
+            if output_type is not None:            
+                try:
+                    output = getattr(child,output_type)()
+                except Exception as e:
+                    print(str(e))
+            else:                    
+                output = child
+            childlist.append(output)
         if child.hasChildren():
-            childlist.extend(iter_children_params(child, []))
+             childlist.extend(iter_children_params(child, [], output_type, filter_type, filter_name, select_filter))
     return childlist
 
 
