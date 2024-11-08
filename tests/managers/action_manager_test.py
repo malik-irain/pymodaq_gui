@@ -32,7 +32,7 @@ def test_icon(qtbot):
 
     assert get_icon_status(action_manager,'no_icon') == True
 
-    action_manager.add_action(short_name='icon_from_pymodaq', icon_name='EditCopy')
+    action_manager.add_action(short_name='icon_from_pymodaq', icon_name='NewFile')
     assert get_icon_status(action_manager,'icon_from_pymodaq') == False
 
     if tuple(map(int, version.split('.'))) > (6, 7):
