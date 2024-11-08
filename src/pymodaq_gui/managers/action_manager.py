@@ -66,7 +66,7 @@ def addaction(name: str = '', icon_name: Union[str,Path,QtGui.QIcon]= '', tip=''
     ----------
     name: str
         Displayed name if should be displayed (for instance in menus)
-        icon_name: str / Path / QtGui.QIcon / enum name
+    icon_name: str / Path / QtGui.QIcon / enum name
         str/Path: the png file name/path to produce the icon
         QtGui.QIcon: the instance of a QIcon element
         ThemeIcon enum: the value of QtGui.QIcon.ThemeIcon (requires Qt>=6.7)
