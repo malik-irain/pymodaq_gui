@@ -58,7 +58,14 @@ They both implements specific methods applicable to a given object but also a ge
 
 .. code-block::
 
-    >>> from pymodaq.utils.tcp_ip.serializer import Serializer, DeSerializer
+    >>> from pymodaq.utils.tcp_ip.serializer import  DeSerializer
+    from pymodaq_data.serialize.serializer_legacy import Serializer
+        >>> string = 'Hello'
+        >>> ser = Serializer(string)
+        >>> print(ser.string_serialization(string))
+        b'\x00\x00\x00\x05Hello'
+
+    In this example, the serializer first send 4 bytes encoding the length of the
     >>> string = 'Hello'
     >>> ser = Serializer(string)
     >>> print(ser.string_serialization(string))

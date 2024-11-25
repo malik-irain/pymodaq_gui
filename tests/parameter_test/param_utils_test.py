@@ -157,10 +157,6 @@ def test_compareValuesParameter():
             putils.compareValuesParameter(param1=P1,param2=P3) == False,
             putils.compareValuesParameter(param1=P1,param2=P4) == False]
 
-        
-
-    
-
 
 class TestScroll:
     def test_scroll_log(self):
@@ -234,4 +230,15 @@ def test_set_param_from_param(qtbot):
 
     assert settings_old.child('main_settings', 'axis').value() == 2
     assert dict_widget.currentText() == 'DAQ2D'
+
+
+def test_ParameterWithPath_serialize():
+
+    p1_with_path = putils.ParameterWithPath(P1.child('numbers', 'afloat', 'aint'))
+    assert isinstance(putils.ser_factory.get_apply_serializer(p1_with_path), bytes)
+
+    param_back: putils.ParameterWithPath = putils.ser_factory.get_apply_deserializer(
+        putils.ser_factory.get_apply_serializer(p1_with_path))[0]
+    assert param_back.path == p1_with_path.path
+    assert putils.compareParameters(param_back.parameter, p1_with_path.parameter)
 
