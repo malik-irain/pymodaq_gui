@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Tuple, Any
+from typing import TYPE_CHECKING, List, Tuple, Any, Union
 from dataclasses import Field, fields
 import numpy as np
 from collections import OrderedDict
@@ -53,7 +53,9 @@ class ParameterWithPath(SerializableBase):
         return bytes_string
 
     @classmethod
-    def deserialize(cls, bytes_str: bytes) -> Tuple[Any, bytes]:
+    def deserialize(cls,
+                    bytes_str: bytes) -> Union[ParameterWithPath,
+                                               Tuple[ParameterWithPath, bytes]]:
         """Convert bytes into a ParameterWithPath object
 
         Returns
@@ -61,8 +63,8 @@ class ParameterWithPath(SerializableBase):
         ParameterWithPath: the decoded object
         bytes: the remaining bytes string if any
         """
-        path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str)
-        param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes)
+        path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str, False)
+        param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes, False)
         param_dict = ioxml.XML_string_to_parameter(param_as_xml)
         param_obj = Parameter(**param_dict[0])
         return ParameterWithPath(param_obj, path), remaining_bytes
