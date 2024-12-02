@@ -273,7 +273,7 @@ class ViewerBase(QObject):
         raise NotImplementedError
 
     def setVisible(self, show=True):
-        """convenience method to show or hide the paretn widget"""
+        """convenience method to show or hide the parent widget"""
         self.parent.setVisible(show)
 
     @property
