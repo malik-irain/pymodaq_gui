@@ -1029,8 +1029,6 @@ def main_spread():
 def main(data_distribution='uniform'):
     """either 'uniform' or 'spread'"""
 
-    from pymodaq_gui.examples.curves import Curve
-
     app = QtWidgets.QApplication(sys.argv)
     widget = QtWidgets.QWidget()
 
@@ -1070,16 +1068,6 @@ def main(data_distribution='uniform'):
 
     button.clicked.connect(lambda: plot_data(prog, ndata.value()))
     widget_button.show()
-
-    curve = Curve()
-    prog.view.plotitem.addItem(curve)
-    curve.setZValue(-10)
-
-    unscaled_x, unscaled_y = prog.view.unscale_axis([d[0] for d in curve.data], [d[1] for d in curve.data])
-
-    curve.setData(list(zip(unscaled_x, unscaled_y)))
-
-
     QtWidgets.QApplication.processEvents()
     sys.exit(app.exec_())
 
