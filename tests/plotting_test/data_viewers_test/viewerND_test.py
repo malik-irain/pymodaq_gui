@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from qtpy import QtWidgets
-from pymodaq_gui.plotting.data_viewers.viewerND import ViewerND
+from pymodaq_gui.plotting.data_viewers import ViewerND, ViewerError
 
 from pymodaq_data import data as data_mod
 from pymodaq_utils import math_utils as mutils
@@ -72,3 +72,26 @@ class TestSpread:
         data_2D_1x2_spread.plot('qt')
         QtWidgets.QApplication.processEvents()
         pass
+
+
+def test_data_5d(init_viewernd):
+    viewer = init_viewernd
+
+    data_array = np.random.rand(5, 11, 15, 6, 20)
+    dwa = data_mod.DataRaw('random', data=[data_array])
+    dwa.create_missing_axes()
+
+    dwa.nav_indexes = (0, 1, 2, 3)
+    viewer.show_data(dwa)
+
+    dwa.nav_indexes = (0, 1, 2, 3, 4)
+    viewer.show_data(dwa)
+
+    dwa.nav_indexes = (0, 1)
+    with pytest.raises(ViewerError):
+        viewer.show_data(dwa)
+
+    dwa.nav_indexes = (0,)
+    with pytest.raises(ViewerError):
+        viewer.show_data(dwa)
+

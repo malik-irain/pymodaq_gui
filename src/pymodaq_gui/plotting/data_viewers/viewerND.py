@@ -843,5 +843,5 @@ def spread_main():
 
 
 if __name__ == '__main__':
-    spread_main()
+    main()
 
