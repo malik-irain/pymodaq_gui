@@ -423,7 +423,7 @@ class View1D(ActionManager, QObject):
         self.connect_action('do_math', self.do_math)
         self.connect_action('scatter', self.data_displayer.update_scatter)
         self.connect_action('xyplot', self.data_displayer.update_xy)
-        self.connect_action('xyplot', self.show_hide_errors)
+        self.connect_action('xyplot', self.process_xyplot)
         self.connect_action('sort', self.data_displayer.update_sort)
         self.connect_action('crosshair', self.show_hide_crosshair)
         self.connect_action('overlay', self.data_displayer.show_overlay)
@@ -438,10 +438,12 @@ class View1D(ActionManager, QObject):
         self.roi_manager.color_signal.connect(self.update_colors)
         self.data_displayer.labels_changed.connect(self.roi_manager.update_use_channel)
 
-    def show_hide_errors(self):
-        """ Uncheck errors button if xyplot is active"""
+    def process_xyplot(self):
+        """ Uncheck things if xyplot is active"""
         if self.is_action_checked('xyplot') and self.is_action_checked('errors'):
             self.get_action('errors').trigger()
+        if self.is_action_checked('xyplot') and self.is_action_checked('overlay'):
+            self.get_action('overlay').trigger()
 
     def update_colors(self, colors: list):
         for ind, roi_name in enumerate(self.roi_manager.ROIs):
