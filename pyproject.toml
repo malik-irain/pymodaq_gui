@@ -45,8 +45,8 @@ dependencies = [
     "scipy",
     "setuptools>=60",
     "toml",
-    "pymodaq_utils",
-    "pymodaq_data>=5.0.3",
+    "pymodaq_utils>=0.0.8",
+    "pymodaq_data>=5.0.13",
 ]
 
 [project.scripts]

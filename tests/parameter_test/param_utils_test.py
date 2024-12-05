@@ -238,7 +238,7 @@ def test_ParameterWithPath_serialize():
     assert isinstance(putils.ser_factory.get_apply_serializer(p1_with_path), bytes)
 
     param_back: putils.ParameterWithPath = putils.ser_factory.get_apply_deserializer(
-        putils.ser_factory.get_apply_serializer(p1_with_path))[0]
+        putils.ser_factory.get_apply_serializer(p1_with_path))
     assert param_back.path == p1_with_path.path
     assert putils.compareParameters(param_back.parameter, p1_with_path.parameter)
 
