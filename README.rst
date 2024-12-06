@@ -9,9 +9,8 @@ PyMoDAQ GUI
    :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://codecov.io/github/malik-irain/pymodaq_gui/graph/badge.svg?token=7N28AKUPJG 
- :target: https://codecov.io/github/malik-irain/pymodaq_gui
-
+.. image:: https://codecov.io/gh/PyMoDAQ/pymodaq_gui/branch/5.0.x_dev/graph/badge.svg?token=dCg4zaWeBa 
+   :target: https://codecov.io/gh/PyMoDAQ/pymodaq_gui/
 
 
 +-------------+-------------------+------------------+---------------------+
