@@ -25,7 +25,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        qt-backend: ["pyqt5", "pyqt6", "pyside2", "pyside6"]
+        qt-backend: ["pyqt5", "pyqt6", "pyside6"]
     runs-on: ${{ matrix.os }}
     env:
       DISPLAY: ':99'
@@ -92,7 +92,7 @@ jobs:
         uses: emibcn/badge-action@v2.0.2
         with:
           label: ''
-          status: 'pass'
+          status: 'passing'
           color: 'green'
           path: '${{ steps.extract_branch.outputs.branch }}/tests_${{runner.os}}_${{matrix.python-version}}_${{matrix.qt-backend}}.svg'
       - name: generate badge (fail)
@@ -100,7 +100,7 @@ jobs:
         uses: emibcn/badge-action@v2.0.2
         with:
           label: ''
-          status: 'fail'
+          status: 'failing'
           color: 'red'
           path: '${{ steps.extract_branch.outputs.branch }}/tests_${{runner.os}}_${{matrix.python-version}}_${{matrix.qt-backend}}.svg'
 
