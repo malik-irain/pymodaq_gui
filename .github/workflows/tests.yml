@@ -91,16 +91,16 @@ jobs:
         if: ${{ success() }}
         uses: emibcn/badge-action@v2.0.2
         with:
-          label: '${{matrix.python-version}} ${{runner.os}} (${{matrix.qt-backend}})'
-          status: 'passing'
+          label: ''
+          status: 'pass'
           color: 'green'
           path: '${{ steps.extract_branch.outputs.branch }}/tests_${{runner.os}}_${{matrix.python-version}}_${{matrix.qt-backend}}.svg'
       - name: generate badge (fail)
         if: ${{ failure() }}
         uses: emibcn/badge-action@v2.0.2
         with:
-          label: '${{matrix.python-version}} ${{runner.os}} (${{matrix.qt-backend}})'
-          status: 'failing'
+          label: ''
+          status: 'fail'
           color: 'red'
           path: '${{ steps.extract_branch.outputs.branch }}/tests_${{runner.os}}_${{matrix.python-version}}_${{matrix.qt-backend}}.svg'
 
