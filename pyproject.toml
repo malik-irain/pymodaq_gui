@@ -49,6 +49,24 @@ dependencies = [
     "pymodaq_data>=5.0.13",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "hatch", 
+    "flake8",
+    "h5py",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    
+    "pyqt5",
+    "pyqt6",
+    "pyside6",
+    "pytest-qt",
+    "pytest-xvfb",
+
+]
+
+
 [project.scripts]
 
 [project.urls]
