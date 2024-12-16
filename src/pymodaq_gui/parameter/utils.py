@@ -1,16 +1,20 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Tuple, Any, Union
 from dataclasses import Field, fields
 import numpy as np
 from collections import OrderedDict
 from dataclasses import dataclass
 from pymodaq_utils.utils import find_keys_from_val
+from pymodaq_utils.serialize.factory import SerializableFactory, SerializableBase
+from pymodaq_gui.parameter import ioxml
 
-if TYPE_CHECKING:
-    from pymodaq_gui.parameter import Parameter
+from pymodaq_gui.parameter import Parameter
+
+ser_factory = SerializableFactory()
 
 
-class ParameterWithPath:
+@SerializableFactory.register_decorator()
+class ParameterWithPath(SerializableBase):
     """ holds together a Parameter object and its full path
 
     To be used when communicating between TCPIP to reconstruct properly the Parameter
@@ -22,6 +26,7 @@ class ParameterWithPath:
     path: full path of the parameter, if None it is constructed from the parameter parents
     """
     def __init__(self, parameter: Parameter, path: List[str] = None):
+        super().__init__()
         self._parameter = parameter
         if path is None:
             path = get_param_path(parameter)
@@ -34,6 +39,35 @@ class ParameterWithPath:
     @property
     def path(self) -> List[str]:
         return self._path
+
+    @staticmethod
+    def serialize(param: 'ParameterWithPath') -> bytes:
+        """
+
+        """
+        bytes_string = b''
+        path = param.path
+        param_as_xml = ioxml.parameter_to_xml_string(param.parameter)
+        bytes_string += ser_factory.get_apply_serializer(path)
+        bytes_string += ser_factory.get_apply_serializer(param_as_xml)
+        return bytes_string
+
+    @classmethod
+    def deserialize(cls,
+                    bytes_str: bytes) -> Union[ParameterWithPath,
+                                               Tuple[ParameterWithPath, bytes]]:
+        """Convert bytes into a ParameterWithPath object
+
+        Returns
+        -------
+        ParameterWithPath: the decoded object
+        bytes: the remaining bytes string if any
+        """
+        path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str, False)
+        param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes, False)
+        param_dict = ioxml.XML_string_to_parameter(param_as_xml)
+        param_obj = Parameter(**param_dict[0])
+        return ParameterWithPath(param_obj, path), remaining_bytes
 
 
 def get_widget_from_tree(parameter_tree, widget_instance):
@@ -104,8 +138,10 @@ def getValues(param:Parameter,) -> OrderedDict:
     """    
     return param.getValues()
 
-def compareParameters(param1:Parameter,param2:Parameter,opts:list=[])-> bool:  
-    """Compare the structure and the opts of two parameters with their children, return True if structure and all opts are identical
+
+def compareParameters(param1:Parameter, param2:Parameter, opts: list = [])-> bool:
+    """Compare the structure and the opts of two parameters with their children,
+     return True if structure and all opts are identical
         Parameters
         ----------
         param1: Parameter
