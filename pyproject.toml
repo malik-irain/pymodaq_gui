@@ -67,5 +67,4 @@ include = [
 [tool.coverage.run]
 omit = [
     "*/examples/*",
-    "*/QtDesigner_Ressources/*"
 ]
