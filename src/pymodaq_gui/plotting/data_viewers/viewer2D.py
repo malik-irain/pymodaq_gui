@@ -616,6 +616,9 @@ class View2D(ActionManager, QtCore.QObject):
     def plotitem(self):
         return self.image_widget.plotitem
 
+    def get_image_item(self, color='red'):
+        return self.data_displayer.get_image(color)
+
     def get_crosshair_signal(self):
         """Convenience function from the Crosshair"""
         return self.crosshair.crosshair_dragged
