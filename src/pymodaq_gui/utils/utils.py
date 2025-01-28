@@ -8,6 +8,8 @@ from pathlib import Path
 from pymodaq_utils.config import Config
 from pymodaq_utils.logger import set_logger, get_module_name
 from pyqtgraph import mkQApp as mkQApppg
+from pymodaq_gui.QtDesigner_Ressources import QtDesigner_ressources_rc
+
 
 config = Config()
 logger = set_logger(get_module_name(__file__))
@@ -40,6 +42,52 @@ def set_dark_palette(app):
     palette.setColor(QPalette.Disabled, QPalette.ColorRole.Light, QColor(53, 53, 53))
 
     app.setPalette(palette)
+
+    # Checkbox are not visible in dark style but it is not possible to
+    # modify QCheckBox style without messing up the check mark (it disappears)
+    # so images are needed to avoid the problem.
+    app.setStyleSheet("""
+        QCheckBox::indicator {
+            width: 1em;
+            height: 1em; 
+        }
+        QCheckBox::indicator:unchecked {
+            image: url(':/widgets/checkbox/unchecked.png');
+        }
+        QCheckBox::indicator:unchecked:disabled {
+            image: url(':/widgets/checkbox/unchecked_disabled.png');
+        }
+        QCheckBox::indicator:unchecked:focus {
+            image: url(':/widgets/checkbox/unchecked_focus.png');
+        }
+        QCheckBox::indicator:unchecked:pressed {
+            image: url(':/widgets/checkbox/unchecked_pressed.png');
+        }
+        QCheckBox::indicator:checked {
+            image: url(':/widgets/checkbox/checked.png');
+        }
+        QCheckBox::indicator:checked:disabled {
+            image: url(':/widgets/checkbox/checked_disabled.png');
+        }
+        QCheckBox::indicator:checked:focus {
+            image: url(':/widgets/checkbox/checked_focus.png');
+        }
+        QCheckBox::indicator:checked:pressed {
+            image: url(':/widgets/checkbox/checked_pressed.png');
+        }
+        QCheckBox::indicator:indeterminate {
+            image: url(':/widgets/checkbox/indeterminate.png');
+        }
+        QCheckBox::indicator:indeterminate:disabled {
+            image: url(':/widgets/checkbox/indeterminate_disabled.png');
+        }
+        QCheckBox::indicator:indeterminate:focus {
+            image: url(':/widgets/checkbox/indeterminate_focus.png');
+        }
+        QCheckBox::indicator:indeterminate:pressed {
+            image: url(':/widgets/checkbox/indeterminate_pressed.png');
+        }""")
+
 
 def clickable(widget):
     class Filter(QObject):

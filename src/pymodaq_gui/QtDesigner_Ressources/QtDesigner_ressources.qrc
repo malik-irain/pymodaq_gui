@@ -1,4 +1,18 @@
 <RCC>
+  <qresource prefix="widgets">
+    <file>checkbox/unchecked.png</file>
+    <file>checkbox/unchecked_disabled.png</file>
+    <file>checkbox/unchecked_focus.png</file>
+    <file>checkbox/unchecked_pressed.png</file>
+    <file>checkbox/checked.png</file>
+    <file>checkbox/checked_disabled.png</file>
+    <file>checkbox/checked_focus.png</file>
+    <file>checkbox/checked_pressed.png</file>
+    <file>checkbox/indeterminate.png</file>
+    <file>checkbox/indeterminate_disabled.png</file>
+    <file>checkbox/indeterminate_focus.png</file>
+    <file>checkbox/indeterminate_pressed.png</file>
+  </qresource>
   <qresource prefix="icons">
 	<file>Icon_Library/stop_all.png</file>
 	<file>Icon_Library/random.png</file>
