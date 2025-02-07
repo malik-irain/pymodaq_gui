@@ -12,6 +12,8 @@
     <file>checkbox/indeterminate_disabled.png</file>
     <file>checkbox/indeterminate_focus.png</file>
     <file>checkbox/indeterminate_pressed.png</file>
+
+    <file>arrow/right.png</file>
   </qresource>
   <qresource prefix="icons">
 	<file>Icon_Library/stop_all.png</file>
