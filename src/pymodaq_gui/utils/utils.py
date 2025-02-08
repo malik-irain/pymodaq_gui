@@ -86,8 +86,13 @@ def set_dark_palette(app):
         }
         QCheckBox::indicator:indeterminate:pressed {
             image: url(':/widgets/checkbox/indeterminate_pressed.png');
-        }""")
+        }
 
+        QToolBarExtension {
+            background: #555555;
+            qproperty-icon: url(:widgets/arrow/right.png);
+        }
+        """)
 
 def clickable(widget):
     class Filter(QObject):
