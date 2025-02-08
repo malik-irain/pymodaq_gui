@@ -590,7 +590,9 @@ class View2D(ActionManager, QtCore.QObject):
 
     def lock_aspect_ratio(self):
         lock = self.is_action_checked('aspect_ratio')
-        self.plotitem.vb.setAspectLocked(lock=lock, ratio=1)
+        x_offset, x_scaling, y_offset, y_scaling = self._get_axis_scaling_offset()
+        ratio = x_scaling / y_scaling
+        self.plotitem.vb.setAspectLocked(lock=lock, ratio=ratio)
 
     @Slot(int, int)
     def move_left_splitter(self, pos, index):
