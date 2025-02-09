@@ -815,6 +815,9 @@ class Viewer2D(ViewerBase):
 
         self.update_data()
 
+        if self.view.is_action_checked('aspect_ratio'):
+            self.view.lock_aspect_ratio()
+
         self.set_visible_items()
         if not self.view.is_action_checked('roi'):
             self.data_to_export_signal.emit(self.data_to_export)
