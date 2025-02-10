@@ -128,3 +128,4 @@ venv.bak/
 *lextab.py
 
 .mu_repo
+src/pymodaq_gui/QtDesigner_Ressources/QtDesigner_ressources_rc.py.bak
