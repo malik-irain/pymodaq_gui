@@ -1,6 +1,6 @@
 import warnings
 
-from pymodaq_utils.warnings_mod import deprecation_msg
+from pymodaq_utils.warnings import deprecation_msg
 from multipledispatch import dispatch
 from typing import Union, Callable, List
 
