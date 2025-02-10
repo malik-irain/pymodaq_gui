@@ -8,7 +8,6 @@ from pathlib import Path
 from pymodaq_utils.config import Config
 from pymodaq_utils.logger import set_logger, get_module_name
 from pyqtgraph import mkQApp as mkQApppg
-from pymodaq_gui.QtDesigner_Ressources import QtDesigner_ressources_rc
 
 
 config = Config()

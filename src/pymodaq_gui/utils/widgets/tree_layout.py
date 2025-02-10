@@ -58,19 +58,19 @@ class TreeLayout(QObject):
         vlayout.addWidget(self.tree)
 
         iconopen = QtGui.QIcon()
-        iconopen.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/tree.png"), QtGui.QIcon.Normal,
+        iconopen.addPixmap(QtGui.QPixmap("icons:tree.png"), QtGui.QIcon.Normal,
                            QtGui.QIcon.Off)
         self.open_tree_pb = QtWidgets.QPushButton('Open Tree')
         self.open_tree_pb.setIcon(iconopen)
 
         iconopensel = QtGui.QIcon()
-        iconopensel.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/tree.png"), QtGui.QIcon.Normal,
+        iconopensel.addPixmap(QtGui.QPixmap("icons:tree.png"), QtGui.QIcon.Normal,
                               QtGui.QIcon.Off)
         self.open_tree_selected_pb = QtWidgets.QPushButton('Open Selected')
         self.open_tree_selected_pb.setIcon(iconopensel)
 
         iconclose = QtGui.QIcon()
-        iconclose.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/CollapseAll.png"), QtGui.QIcon.Normal,
+        iconclose.addPixmap(QtGui.QPixmap("icons:CollapseAll.png"), QtGui.QIcon.Normal,
                             QtGui.QIcon.Off)
         self.close_tree_pb = QtWidgets.QPushButton('Close Tree')
         self.close_tree_pb.setIcon(iconclose)

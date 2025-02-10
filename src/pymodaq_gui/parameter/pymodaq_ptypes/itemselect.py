@@ -20,13 +20,13 @@ class ItemSelect_pb(QtWidgets.QWidget):
         self.add_pb = QtWidgets.QPushButton()
         self.add_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("icons:Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_pb.setIcon(icon3)        
         # Pushbutton Remove
         self.remove_pb = QtWidgets.QPushButton()
         self.remove_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("icons:remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.remove_pb.setIcon(icon3)               
         #### Layout ###
         self.ver_layout = QtWidgets.QVBoxLayout()    

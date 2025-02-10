@@ -7,9 +7,11 @@ from typing import Union, Callable, List
 from qtpy import QtGui, QtWidgets, QtCore
 from qtpy.QtWidgets import QAction
 
-from pymodaq_gui.QtDesigner_Ressources import QtDesigner_ressources_rc
 from pathlib import Path
 
+here = Path(__file__).parent
+icon_folder = here.parent.joinpath('QtDesigner_Ressources/Icon_Library/')
+QtCore.QDir.addSearchPath('icons', str(icon_folder))
 
 def create_icon(icon_name: str):
     icon = QtGui.QIcon()
@@ -17,7 +19,7 @@ def create_icon(icon_name: str):
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal,
                        QtGui.QIcon.Off)
     else:
-        icon.addPixmap(QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png"), QtGui.QIcon.Normal,
+        icon.addPixmap(QtGui.QPixmap(f"icons:{icon_name}.png"), QtGui.QIcon.Normal,
                        QtGui.QIcon.Off)
     return icon
 
