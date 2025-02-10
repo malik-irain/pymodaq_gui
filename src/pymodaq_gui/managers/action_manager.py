@@ -56,7 +56,7 @@ class QAction(QAction):
         return f'QAction {self.text()}'
 
 
-def addaction(name: str = '', icon_name: Union[str,Path,QtGui.QIcon]= '', tip='', checkable=False, checked=False,
+def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip='', checkable=False, checked=False,
               slot: Callable = None, toolbar: QtWidgets.QToolBar = None,
               menu: QtWidgets.QMenu = None, visible=True, shortcut=None,
               enabled=True):
@@ -91,7 +91,7 @@ def addaction(name: str = '', icon_name: Union[str,Path,QtGui.QIcon]= '', tip=''
     """
     
     if icon_name != '':
-        if isinstance(icon_name,QtGui.QIcon):    
+        if isinstance(icon_name, QtGui.QIcon):    
             action = QAction(icon_name, name, None)
         else:            
             action = QAction(create_icon(icon_name), name, None)
@@ -202,7 +202,7 @@ class ActionManager:
         raise NotImplementedError(f'You have to define actions here in the following form:'
                                   f'{self.setup_actions.__doc__}')
 
-    def add_action(self, short_name: str = '', name: str = '', icon_name: Union[str,Path,QtGui.QIcon] = '', tip='',
+    def add_action(self, short_name: str = '', name: str = '', icon_name: Union[str, Path, QtGui.QIcon] = '', tip='',
                    checkable=False,
                    checked=False, toolbar=None, menu=None,
                    visible=True, shortcut=None, auto_toolbar=True, auto_menu=True,
