@@ -86,7 +86,7 @@ class FileDirWidget(QtWidgets.QWidget):
         self.base_path_browse_pb = QtWidgets.QPushButton()
         self.base_path_browse_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Browse_Dir_Path.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("icons:Browse_Dir_Path.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.base_path_browse_pb.setIcon(icon3)
         self.hor_layout.addWidget(self.base_path_edit)
 

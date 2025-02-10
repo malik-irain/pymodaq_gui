@@ -12,8 +12,8 @@ class QLED(QLabel):
     def __init__(self, parent=None, scale=1, readonly=True):
         QLabel.__init__(self, parent)
         # self.setText("")
-        self.red_icon = QtGui.QPixmap(":/icons/Icon_Library/red_light.png")
-        self.green_icon = QtGui.QPixmap(":/icons/Icon_Library/greenLight2.png")
+        self.red_icon = QtGui.QPixmap("icons:red_light.png")
+        self.green_icon = QtGui.QPixmap("icons:greenLight2.png")
         self.setPixmap(self.red_icon)
         self.state = False
         self.clickable = not readonly

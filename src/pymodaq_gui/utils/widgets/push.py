@@ -18,7 +18,7 @@ class PushButtonIcon(QtWidgets.QPushButton):
                 icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal,
                                QtGui.QIcon.Off)
             else:
-                icon.addPixmap(QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png"), QtGui.QIcon.Normal,
+                icon.addPixmap(QtGui.QPixmap(f"icons:{icon_name}.png"), QtGui.QIcon.Normal,
                                QtGui.QIcon.Off)
             self.setIcon(icon)
         self.setCheckable(checkable)
@@ -127,7 +127,7 @@ def main(init_qt=True):
     menu2.addAction('Show localisation')
 
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(f":/icons/Icon_Library/{'run2'}.png"), QtGui.QIcon.Normal,
+    icon.addPixmap(QtGui.QPixmap(f"icons:{'run2'}.png"), QtGui.QIcon.Normal,
                    QtGui.QIcon.Off)
     action2 = ActionMenu(icon, 'grab', menu=menu1)
 

@@ -423,9 +423,9 @@ class ROIManager(QObject):
         self.toolbar = QtWidgets.QToolBar()
         vlayout.addWidget(self.toolbar)
 
-        self.save_ROI_pb = QAction(QIcon(QPixmap(":/icons/Icon_Library/save_ROI.png")), 'Save ROIs')
-        self.load_ROI_pb = QAction(QIcon(QPixmap(":/icons/Icon_Library/load_ROI.png")), 'Load ROIs')
-        self.clear_ROI_pb = QAction(QIcon(QPixmap(":/icons/Icon_Library/clear_ROI.png")), 'Clear ROIs')
+        self.save_ROI_pb = QAction(QIcon(QPixmap("icons:save_ROI.png")), 'Save ROIs')
+        self.load_ROI_pb = QAction(QIcon(QPixmap("icons:load_ROI.png")), 'Load ROIs')
+        self.clear_ROI_pb = QAction(QIcon(QPixmap("icons:clear_ROI.png")), 'Clear ROIs')
         self.toolbar.addActions([self.save_ROI_pb, self.load_ROI_pb, self.clear_ROI_pb])
 
 
