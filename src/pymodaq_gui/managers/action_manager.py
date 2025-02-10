@@ -11,7 +11,7 @@ from pymodaq_gui.QtDesigner_Ressources import QtDesigner_ressources_rc
 from pathlib import Path
 
 
-def create_icon(icon_name: Union[str,Path]):
+def create_icon(icon_name: Union[str, Path]):
     icon = QtGui.QIcon()
     if Path(icon_name).is_file(): # Test if icon is in path
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal,
