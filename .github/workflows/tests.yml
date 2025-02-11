@@ -57,10 +57,16 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install -y libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-cursor0 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 x11-utils libgl1 libegl1
-          sudo apt-get install -y hicolor-icon-theme adwaita-icon-theme
+          sudo apt install -y  yaru-theme-icon libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-cursor0 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 x11-utils libgl1 libegl1
           export QT_DEBUG_PLUGINS=1
-          export XDG_DATA_DIRS=/usr/share:/usr/share/icons
+          export XDG_CURRENT_DESKTOP=Unity
+          export XDG_DATA_DIRS=/usr/share:/usr/share/icons:/usr/local/share
+          export GTK_THEME=Yaru
+          
+          echo "XDG_CURRENT_DESKTOP=Unity" >> $GITHUB_ENV
+          echo "XDG_DATA_DIRS=/usr/share:/usr/share/icons:/usr/local/share" >> $GITHUB_ENV
+          echo "GTK_THEME=Yaru" >> $GITHUB_ENV
+          ls /usr/share/icons/Yaru
           sudo mkdir -p /etc/.pymodaq
           sudo chmod uo+rw /etc/.pymodaq
       - name: Exporting debug variables (Windows)
