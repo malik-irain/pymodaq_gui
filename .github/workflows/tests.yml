@@ -60,7 +60,7 @@ jobs:
           sudo apt install -y libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-cursor0 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 x11-utils libgl1 libegl1
           sudo apt-get install -y hicolor-icon-theme adwaita-icon-theme
           export QT_DEBUG_PLUGINS=1
-          echo "XDG_DATA_DIRS=/usr/share:/usr/local/share" >> $GITHUB_ENV
+          export XDG_DATA_DIRS=/usr/share:/usr/share/icons
           sudo mkdir -p /etc/.pymodaq
           sudo chmod uo+rw /etc/.pymodaq
       - name: Exporting debug variables (Windows)
