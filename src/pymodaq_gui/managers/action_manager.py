@@ -20,7 +20,7 @@ def create_icon(icon_name: Union[str, Path]):
         pixmap = QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png") # Test if icon is in pymodaq's library
         if pixmap.isNull():
             print(f'{icon_name} is not in pymodaq') 
-            print(f'{icon_name} {hasattr(QtGui.QIcon,'ThemeIcon')}, {hasattr(QtGui.QIcon.ThemeIcon,icon_name)}') 
+            print('{} ({}, {})'.format(icon_name, hasattr(QtGui.QIcon,'ThemeIcon'), hasattr(QtGui.QIcon.ThemeIcon,icon_name))) 
             if hasattr(QtGui.QIcon,'ThemeIcon') and hasattr(QtGui.QIcon.ThemeIcon,icon_name): # Test if icon is in Qt's library
                 icon = QtGui.QIcon.fromTheme(getattr(QtGui.QIcon.ThemeIcon,icon_name))
         else:
