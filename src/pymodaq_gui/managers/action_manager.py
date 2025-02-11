@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 def create_icon(icon_name: Union[str, Path]):
-    print(f'creating icon  {icon_name}')
+    print(f'Creating icon {icon_name}')
     icon = QtGui.QIcon()
     if Path(icon_name).is_file(): # Test if icon is in path
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -89,14 +89,15 @@ def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip=
     enabled: bool
         set the enabled state
     """
+
+    print(f"Adding icon {icon_name} {type(icon_name)}")
     
-    if icon_name != '':
-        if isinstance(icon_name, QtGui.QIcon):    
-            action = QAction(icon_name, name, None)
-        else:            
-            action = QAction(create_icon(icon_name), name, None)
-    else:
+    if icon_name is None:
         action = QAction(name)
+    elif isinstance(icon_name, QtGui.QIcon):
+        action = QAction(icon_name, name, None)
+    else:
+        action = QAction(create_icon(icon_name), name, None)
 
     if slot is not None:
         action.connect_to(slot)
