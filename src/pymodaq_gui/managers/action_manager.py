@@ -12,9 +12,8 @@ from pathlib import Path
 
 
 def create_icon(icon_name: Union[str, Path]):
-
+    icon = QtGui.QIcon()
     if Path(icon_name).is_file(): # Test if icon is in path
-        icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     else:
         pixmap = QtGui.QPixmap(f":/icons/Icon_Library/{icon_name}.png") # Test if icon is in pymodaq's library
