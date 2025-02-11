@@ -1,4 +1,20 @@
 <RCC>
+  <qresource prefix="widgets">
+    <file>checkbox/unchecked.png</file>
+    <file>checkbox/unchecked_disabled.png</file>
+    <file>checkbox/unchecked_focus.png</file>
+    <file>checkbox/unchecked_pressed.png</file>
+    <file>checkbox/checked.png</file>
+    <file>checkbox/checked_disabled.png</file>
+    <file>checkbox/checked_focus.png</file>
+    <file>checkbox/checked_pressed.png</file>
+    <file>checkbox/indeterminate.png</file>
+    <file>checkbox/indeterminate_disabled.png</file>
+    <file>checkbox/indeterminate_focus.png</file>
+    <file>checkbox/indeterminate_pressed.png</file>
+
+    <file>arrow/right.png</file>
+  </qresource>
   <qresource prefix="icons">
 	<file>Icon_Library/stop_all.png</file>
 	<file>Icon_Library/random.png</file>
@@ -35,6 +51,7 @@
     <file>Icon_Library/autoscale.png</file>
     <file>Icon_Library/b_icon.png</file>
     <file>Icon_Library/back.png</file>
+    <file>Icon_Library/back-and-forth.png</file>    
     <file>Icon_Library/bg_icon.png</file>
     <file>Icon_Library/Browse_Dir_Path.png</file>
     <file>Icon_Library/Calculator.png</file>
@@ -58,6 +75,7 @@
     <file>Icon_Library/DeleteLayer.png</file>
     <file>Icon_Library/download.png</file>
     <file>Icon_Library/download2.png</file>
+    <file>Icon_Library/EditFile.png</file>
     <file>Icon_Library/EditOpen.png</file>
     <file>Icon_Library/EditRedo.png</file>
     <file>Icon_Library/EditUndo.png</file>
@@ -74,6 +92,7 @@
     <file>Icon_Library/ExpandAll.png</file>
     <file>Icon_Library/ExpandAll_32.png</file>
     <file>Icon_Library/fan.png</file>
+    <file>Icon_Library/flip.png</file>    
     <file>Icon_Library/FFT.png</file>
     <file>Icon_Library/filter2.png</file>
     <file>Icon_Library/g_icon.png</file>
@@ -195,6 +214,8 @@
     <file>Icon_Library/SelectPolygon.png</file>
     <file>Icon_Library/sequence.png</file>
     <file>Icon_Library/sequence2.png</file>
+    <file>Icon_Library/show.png</file>    
+    <file>Icon_Library/shuffle.png</file>    
     <file>Icon_Library/Snap&amp;Save.png</file>
     <file>Icon_Library/snap.png</file>
     <file>Icon_Library/Snapshot.png</file>
@@ -215,6 +236,7 @@
     <file>Icon_Library/surfacePlot.png</file>
     <file>Icon_Library/tree.png</file>
     <file>Icon_Library/updateTree.png</file>
+    <file>Icon_Library/unshow.png</file>    
     <file>Icon_Library/utility_small.png</file>
     <file>Icon_Library/utility2.png</file>
     <file>Icon_Library/vector.png</file>

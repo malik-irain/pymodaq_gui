@@ -590,7 +590,9 @@ class View2D(ActionManager, QtCore.QObject):
 
     def lock_aspect_ratio(self):
         lock = self.is_action_checked('aspect_ratio')
-        self.plotitem.vb.setAspectLocked(lock=lock, ratio=1)
+        x_offset, x_scaling, y_offset, y_scaling = self._get_axis_scaling_offset()
+        ratio = x_scaling / y_scaling
+        self.plotitem.vb.setAspectLocked(lock=lock, ratio=ratio)
 
     @Slot(int, int)
     def move_left_splitter(self, pos, index):
@@ -615,6 +617,9 @@ class View2D(ActionManager, QtCore.QObject):
     @property
     def plotitem(self):
         return self.image_widget.plotitem
+
+    def get_image_item(self, color='red'):
+        return self.data_displayer.get_image(color)
 
     def get_crosshair_signal(self):
         """Convenience function from the Crosshair"""
@@ -809,6 +814,9 @@ class Viewer2D(ViewerBase):
         self.isdata['blue'] = len(data) > 2
 
         self.update_data()
+
+        if self.view.is_action_checked('aspect_ratio'):
+            self.view.lock_aspect_ratio()
 
         self.set_visible_items()
         if not self.view.is_action_checked('roi'):
