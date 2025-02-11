@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 def create_icon(icon_name: Union[str, Path]):
+    print(f'creating icon  {icon_name}')
     icon = QtGui.QIcon()
     if Path(icon_name).is_file(): # Test if icon is in path
         icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal, QtGui.QIcon.Off)
