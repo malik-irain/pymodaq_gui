@@ -13,6 +13,12 @@ from pyqtgraph import mkQApp as mkQApppg
 config = Config()
 logger = set_logger(get_module_name(__file__))
 
+
+here = Path(__file__).parent
+custom_folder = here.parent.joinpath('QtDesigner_Ressources/custom/')
+print(custom_folder)
+QtCore.QDir.addSearchPath('custom', str(custom_folder))
+
 def set_dark_palette(app):
     from qtpy.QtGui import QPalette, QColor
     app.setStyle("Fusion")
@@ -51,45 +57,45 @@ def set_dark_palette(app):
             height: 1em; 
         }
         QCheckBox::indicator:unchecked {
-            image: url(':/widgets/checkbox/unchecked.png');
+            image: url('custom:checkbox/unchecked.png');
         }
         QCheckBox::indicator:unchecked:disabled {
-            image: url(':/widgets/checkbox/unchecked_disabled.png');
+            image: url('custom:checkbox/unchecked_disabled.png');
         }
         QCheckBox::indicator:unchecked:focus {
-            image: url(':/widgets/checkbox/unchecked_focus.png');
+            image: url('custom:checkbox/unchecked_focus.png');
         }
         QCheckBox::indicator:unchecked:pressed {
-            image: url(':/widgets/checkbox/unchecked_pressed.png');
+            image: url('custom:checkbox/unchecked_pressed.png');
         }
         QCheckBox::indicator:checked {
-            image: url(':/widgets/checkbox/checked.png');
+            image: url('custom:checkbox/checked.png');
         }
         QCheckBox::indicator:checked:disabled {
-            image: url(':/widgets/checkbox/checked_disabled.png');
+            image: url('custom:checkbox/checked_disabled.png');
         }
         QCheckBox::indicator:checked:focus {
-            image: url(':/widgets/checkbox/checked_focus.png');
+            image: url('custom:checkbox/checked_focus.png');
         }
         QCheckBox::indicator:checked:pressed {
-            image: url(':/widgets/checkbox/checked_pressed.png');
+            image: url('custom:checkbox/checked_pressed.png');
         }
         QCheckBox::indicator:indeterminate {
-            image: url(':/widgets/checkbox/indeterminate.png');
+            image: url('custom:checkbox/indeterminate.png');
         }
         QCheckBox::indicator:indeterminate:disabled {
-            image: url(':/widgets/checkbox/indeterminate_disabled.png');
+            image: url('custom:checkbox/indeterminate_disabled.png');
         }
         QCheckBox::indicator:indeterminate:focus {
-            image: url(':/widgets/checkbox/indeterminate_focus.png');
+            image: url('custom:checkbox/indeterminate_focus.png');
         }
         QCheckBox::indicator:indeterminate:pressed {
-            image: url(':/widgets/checkbox/indeterminate_pressed.png');
+            image: url('custom:checkbox/indeterminate_pressed.png');
         }
 
         QToolBarExtension {
             background: #555555;
-            qproperty-icon: url(:widgets/arrow/right.png);
+            qproperty-icon: url('custom:arrow/right.png');
         }
         """)
 
