@@ -16,7 +16,6 @@ logger = set_logger(get_module_name(__file__))
 
 here = Path(__file__).parent
 custom_folder = here.parent.joinpath('QtDesigner_Ressources/custom/')
-print(custom_folder)
 QtCore.QDir.addSearchPath('custom', str(custom_folder))
 
 def set_dark_palette(app):
