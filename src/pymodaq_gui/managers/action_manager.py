@@ -13,14 +13,18 @@ here = Path(__file__).parent
 icon_folder = here.parent.joinpath('QtDesigner_Ressources/Icon_Library/')
 QtCore.QDir.addSearchPath('icons', str(icon_folder))
 
-def create_icon(icon_name: str):
+def create_icon(icon_name: Union[str, Path]):
     icon = QtGui.QIcon()
-    if Path(icon_name).is_file():
-        icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal,
-                       QtGui.QIcon.Off)
+    if Path(icon_name).is_file(): # Test if icon is in path
+        icon.addPixmap(QtGui.QPixmap(icon_name), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     else:
-        icon.addPixmap(QtGui.QPixmap(f"icons:{icon_name}.png"), QtGui.QIcon.Normal,
-                       QtGui.QIcon.Off)
+        pixmap = QtGui.QPixmap(f"icons:{icon_name}.png") # Test if icon is in pymodaq's library
+        if pixmap.isNull(): 
+            if hasattr(QtGui.QIcon,'ThemeIcon') and hasattr(QtGui.QIcon.ThemeIcon, icon_name): # Test if icon is in Qt's library
+                icon = QtGui.QIcon.fromTheme(getattr(QtGui.QIcon.ThemeIcon, icon_name))
+        else:
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(pixmap), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     return icon
 
 
@@ -53,7 +57,7 @@ class QAction(QAction):
         return f'QAction {self.text()}'
 
 
-def addaction(name: str = '', icon_name: str = '', tip='', checkable=False, checked=False,
+def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip='', checkable=False, checked=False,
               slot: Callable = None, toolbar: QtWidgets.QToolBar = None,
               menu: QtWidgets.QMenu = None, visible=True, shortcut=None,
               enabled=True):
@@ -63,8 +67,10 @@ def addaction(name: str = '', icon_name: str = '', tip='', checkable=False, chec
     ----------
     name: str
         Displayed name if should be displayed (for instance in menus)
-    icon_name: str
-        png file name to produce the icon
+    icon_name: str / Path / QtGui.QIcon / enum name
+        str/Path: the png file name/path to produce the icon
+        QtGui.QIcon: the instance of a QIcon element
+        ThemeIcon enum: the value of QtGui.QIcon.ThemeIcon (requires Qt>=6.7)
     tip: str
         a tooltip to be displayed when hovering above the action
     checkable: bool
@@ -84,10 +90,13 @@ def addaction(name: str = '', icon_name: str = '', tip='', checkable=False, chec
     enabled: bool
         set the enabled state
     """
-    if icon_name != '':
-        action = QAction(create_icon(icon_name), name, None)
-    else:
+
+    if icon_name is None or icon_name == '':
         action = QAction(name)
+    elif isinstance(icon_name, QtGui.QIcon):
+        action = QAction(icon_name, name, None)
+    else:
+        action = QAction(create_icon(icon_name), name, None)
 
     if slot is not None:
         action.connect_to(slot)
@@ -193,7 +202,7 @@ class ActionManager:
         raise NotImplementedError(f'You have to define actions here in the following form:'
                                   f'{self.setup_actions.__doc__}')
 
-    def add_action(self, short_name: str = '', name: str = '', icon_name: str = '', tip='',
+    def add_action(self, short_name: str = '', name: str = '', icon_name: Union[str, Path, QtGui.QIcon] = '', tip='',
                    checkable=False,
                    checked=False, toolbar=None, menu=None,
                    visible=True, shortcut=None, auto_toolbar=True, auto_menu=True,
@@ -206,8 +215,10 @@ class ActionManager:
             the name as referenced in the dict self.actions
         name: str
             Displayed name if should be displayed in
-        icon_name: str
-            png file name to produce the icon
+        icon_name: str / Path / QtGui.QIcon / enum name
+            str/Path: the png file name/path to produce the icon
+            QtGui.QIcon: the instance of a QIcon element
+            ThemeIcon enum: the value of QtGui.QIcon.ThemeIcon (requires Qt>=6.7)
         tip: str
             a tooltip to be displayed when hovering above the action
         checkable: bool
