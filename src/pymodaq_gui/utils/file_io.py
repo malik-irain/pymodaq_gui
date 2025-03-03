@@ -61,7 +61,7 @@ def select_file_filter(start_path=config('data_saving', 'h5file', 'save_path'), 
 
 def select_file(start_path=config('data_saving', 'h5file', 'save_path'), save=True, ext=None,
                 filter=None,
-                force_save_extension=False):
+                force_save_extension=False) -> Path:
     """Opens a selection file popup for loading or saving a file
 
     Parameters
