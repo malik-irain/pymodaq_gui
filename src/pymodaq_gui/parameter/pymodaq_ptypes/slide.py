@@ -102,9 +102,16 @@ class SliderSpinBox(QtWidgets.QWidget):
         except Exception:
             pass
         if self.subtype == 'linear':
-            value = int((val - min_val) / (max_val - min_val) * 100)
+            try:
+                value = np.rint((val - min_val) / (max_val - min_val) * 100)
+            except ZeroDivisionError:
+                value = 50
         else:
-            value = int((np.log10(val) - np.log10(min_val)) / (np.log10(max_val) - np.log10(min_val)) * 100)
+            try:
+                value = np.rint((np.log10(val) - np.log10(min_val)) / (np.log10(max_val) - np.log10(min_val)) * 100)
+            except ZeroDivisionError:
+                value  = 50
+        value = int(value)
         self.slider.setValue(value)
         self.slider.valueChanged.connect(self.update_spinbox)
         self.spinbox.valueChanged.connect(self.update_slide)
@@ -125,7 +132,7 @@ class SliderParameterItem(WidgetParameterItem):
             'value': 0, 'min': None, 'max': None,
              'dec': False,
             'siPrefix': False, 'suffix': '', 'decimals': 12,
-            'int': False
+            'int': False, 'bounds': None,
         }
         #Update relevant opts
         for k in defs:
@@ -134,15 +141,16 @@ class SliderParameterItem(WidgetParameterItem):
         #Additional changes according to user syntax
         if 'subtype' not in opts:
             opts['subtype'] = 'linear'
-        defs['bounds'] = [0., float(self.param.value() or 1)]  # max value set to default value when no max given or 1 if no default
-        if 'limits' not in opts:
-            if 'min' in opts:
-                defs['bounds'][0] = opts['min']
-            if 'max' in opts:
-                defs['bounds'][1] = opts['max']
-        else:
-            defs['bounds'] = opts['limits']
-                                
+        if defs['bounds'] is None:
+            defs['bounds'] = [0., float(self.param.value() or 1)]  # max value set to default value when no max given or 1 if no default
+            if 'limits' not in opts:
+                if 'min' in opts:
+                    defs['bounds'][0] = opts['min']
+                if 'max' in opts:
+                    defs['bounds'][1] = opts['max']
+            else:
+                defs['bounds'] = opts['limits']
+
         w = SliderSpinBox(subtype=opts['subtype'],**defs)
         self.setSizeHint(1, QtCore.QSize(50, 50))
         return w
@@ -158,6 +166,33 @@ class SliderParameterItem(WidgetParameterItem):
         super().showEditor()
         self.widget.spinbox.setFocus()     
 
+    def optsChanged(self, param, opts):
+        # Reimplement optsChanged to correctly update spinbox opts when changed
+        try:
+            super().optsChanged(param, opts)
+        except AttributeError:
+            pass
+        sbOpts = {}                  
+        if 'bounds' in opts:
+            lim = opts.pop('bounds')
+            self.limitsChanged(None,lim)
+            
+        if 'min' in opts:
+            self.widget.spinbox.setMinimum(opts['min'])            
+        if 'max' in opts:
+            self.widget.spinbox.setMaximum(opts['max'])            
+
+        for k, v in opts.items():
+            if k in self.widget.spinbox.opts:
+                sbOpts[k] = v
+        self.widget.spinbox.setOpts(**sbOpts)
+        self.updateDisplayLabel()
+
+        self.limitsChanged(param,limits=self.widget.spinbox.opts['bounds'])
+
+    def limitsChanged(self, param, limits):
+        self.widget.spinbox.setOpts(bounds=limits)        
+        self.widget.update_slide(self.widget.spinbox.value())
 
 class SliderParameter(SimpleParameter):
     itemClass = SliderParameterItem
