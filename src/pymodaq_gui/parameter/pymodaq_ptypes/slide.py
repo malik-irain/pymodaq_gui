@@ -102,9 +102,15 @@ class SliderSpinBox(QtWidgets.QWidget):
         except Exception:
             pass
         if self.subtype == 'linear':
-            value = np.rint((val - min_val) / (max_val - min_val) * 100)
+            try:
+                value = np.rint((val - min_val) / (max_val - min_val) * 100)
+            except ZeroDivisionError:
+                value = 50
         else:
-            value = np.rint((np.log10(val) - np.log10(min_val)) / (np.log10(max_val) - np.log10(min_val)) * 100)
+            try:
+                value = np.rint((np.log10(val) - np.log10(min_val)) / (np.log10(max_val) - np.log10(min_val)) * 100)
+            except ZeroDivisionError:
+                value  = 50
         value = int(value)
         self.slider.setValue(value)
         self.slider.valueChanged.connect(self.update_spinbox)
