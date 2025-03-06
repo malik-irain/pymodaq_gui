@@ -148,11 +148,25 @@ def h5tree_to_QTree(base_node, base_tree_elt=None, pixmap_items=[]):
         base_tree_elt = QtWidgets.QTreeWidgetItem([base_node.name, "", base_node.path])
     for node_name, node in base_node.children().items():
         child = QtWidgets.QTreeWidgetItem([node_name, "", node.path])
+        klass = node.attrs['CLASS']
+        tooltip = []
+
+        if 'origin' in node.attrs.attrs_name:
+            tooltip.append(node.attrs['origin'])
+        elif klass == 'GROUP':
+            for c in node.children().values():
+                if 'origin' in c.attrs.attrs_name:
+                    tooltip.append(c.attrs['origin'])
+                    break
+
         if hasattr(node, 'title') and node.title:
-            child.setToolTip(0, node.title)
+            tooltip.append(node.title)
+
+        child.setToolTip(0, '/'.join(tooltip))
+
         if 'pixmap' in node.attrs.attrs_name:
             pixmap_items.append(dict(node=node, item=child))
-        klass = node.attrs['CLASS']
+
         if klass == 'GROUP':
             h5tree_to_QTree(node, child, pixmap_items)
 
