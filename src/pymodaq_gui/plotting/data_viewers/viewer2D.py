@@ -47,7 +47,7 @@ COLOR_LIST = utils.plot_colors
 crosshair_pens = make_dashed_pens(color=(255, 255, 0))
 
 
-def image_item_factory(item_type='uniform', axisOrder='row-major', pen='r'):
+def image_item_factory(item_type='uniform', axisOrder='row-major', pen='r') -> Union[UniformImageItem, SpreadImageItem]:
     if item_type == 'uniform':
         image = UniformImageItem(pen=pen)
         image.setOpts(axisOrder=axisOrder)
@@ -94,8 +94,9 @@ class ImageDisplayer(QObject):
         self._plotitem.addLegend()
         self.show_legend(False)
         self.display_type = data_distribution
-        self._image_items = dict([])
+        self._image_items: dict[str, Union[UniformImageItem, SpreadImageItem]] = dict([])
         self._autolevels = False
+        self._levels_sym = False
         self._data: DataWithAxes = None
 
         self.update_display_items()
@@ -127,9 +128,15 @@ class ImageDisplayer(QObject):
     def autolevels(self):
         return self._autolevels
 
-    @Slot(bool)
-    def set_autolevels(self, isautolevel):
+    def set_autolevels(self, isautolevel: bool):
         self._autolevels = isautolevel
+
+    @property
+    def levels_sym(self) -> bool:
+        return self._levels_sym
+
+    def set_levels_sym(self, levels_sym: bool):
+        self._levels_sym = levels_sym
 
     def update_data(self, dwa: DataWithAxes):
         if dwa.labels != self.labels:
@@ -140,13 +147,15 @@ class ImageDisplayer(QObject):
         for ind_data, data_array in enumerate(dwa.data):
             if data_array.size > 0:
                 if self.display_type == 'uniform':
-                    self._image_items[IMAGE_TYPES[ind_data]].setImage(data_array, self.autolevels)
+                    self._image_items[IMAGE_TYPES[ind_data]].setImage(data_array, self.autolevels,
+                                                                      levels_sym=self.levels_sym)
                 else:
                     nav_axes = dwa.get_nav_axes()
                     data_array = np.stack((nav_axes[0].get_data(),
                                            nav_axes[1].get_data(),
                                            data_array), axis=0).T
-                    self._image_items[IMAGE_TYPES[ind_data]].setImage(data_array, self.autolevels)
+                    self._image_items[IMAGE_TYPES[ind_data]].setImage(data_array, self.autolevels,
+                                                                      levels_sym=self.levels_sym)
 
     def update_display_items(self, labels: List[str] = None):
         while len(self._image_items) > 0:
@@ -180,6 +189,7 @@ class Histogrammer(QObject):
         self._histogram_container = histogram_container
         self.setup_histograms()
         self._autolevels = False
+        self._levels_sym = False
 
     def setup_histograms(self):
         for histo_key in self._histogram_refs:
@@ -346,6 +356,7 @@ class View2D(ActionManager, QtCore.QObject):
         self.connect_action('isocurve', self.isocurver.show_hide_iso)
         self.data_displayer.updated_item.connect(self.histogrammer.affect_histo_to_imageitems)
         self.connect_action('autolevels', self.data_displayer.set_autolevels)
+        self.connect_action('auto_levels_sym', self.data_displayer.set_levels_sym)
         for key in IMAGE_TYPES:
             self.connect_action(key, self.notify_visibility_data_displayer)
 
@@ -929,6 +940,7 @@ class Viewer2D(ViewerBase):
         self.view.connect_action('flip_lr', slot=self.update_data)
         self.view.connect_action('rotate', slot=self.update_data)
         self.view.connect_action('autolevels', slot=self.update_data)
+        self.view.connect_action('auto_levels_sym', slot=self.update_data)
         self.view.connect_action('opposite', slot=self.update_data)
         self.view.connect_action('isocurve', slot=self.update_data)
         self.view.histogrammer.gradient_changed.connect(lambda: setattr(self, '_is_gradient_manually_set', True))
@@ -1087,7 +1099,9 @@ def generate_uniform_data() -> DataRaw:
     data_random = np.random.normal(size=(Ny, Nx))
     x = 0.5 * np.linspace(-Nx / 2, Nx / 2 - 1, Nx)
     y = 0.2 * np.linspace(-Ny / 2, Ny / 2 - 1, Ny)
-    data_red = 3 * np.sin(x / 5) ** 2 * gauss2D(x, 5, Nx / 10, y, -1, Ny / 10, 1, 90) + 0.2 * data_random
+    x0 = 5
+    data_red = 3 * np.cos((x-x0) / 5) * gauss2D(x, x0, Nx / 10, y, -1, Ny / 10, 1, 90) + 0.5 * data_random
+    data_red[data_red < -2] = np.nan
     data_green = 10 * gauss2D(x, -20, Nx / 10, y, -10, Ny / 20, 1, 0)
     data_green[70:80, 7:12] = np.nan
 
