@@ -4,6 +4,7 @@ import numpy as np
 import pyqtgraph as pg
 from pymodaq_gui.plotting.utils.plot_utils import makeAlphaTriangles, makePolygons
 from pyqtgraph import debug as debug, Point, functions as fn
+from pyqtgraph.util.cupy_helper import getCupy
 from qtpy import QtCore, QtGui
 
 
@@ -54,6 +55,110 @@ class UniformImageItem(PymodaqImage):
     #     self._dataTransform.scale(rect.width() / self.width(), rect.height() / self.height())
 
 
+    def setImage(self, image=None, autoLevels=None, levels_sym=False, **kargs):
+        """
+        Updates the image displayed by this ImageItem. For more information on how the image
+        is processed before displaying, see :func:`~pyqtgraph.makeARGB`.
+
+        For backward compatibility, image data is assumed to be in column-major order (column, row) by default.
+        However, most data is stored in row-major order (row, column). It can either be transposed before assignment::
+
+            imageitem.setImage(imagedata.T)
+
+        or the interpretation of the data can be changed locally through the ``axisOrder`` keyword or by changing the
+        `imageAxisOrder` :ref:`global configuration option <apiref_config>`
+
+        All keywords supported by :func:`~pyqtgraph.ImageItem.setOpts` are also allowed here.
+
+        Parameters
+        ----------
+        image: np.ndarray, optional
+            Image data given as NumPy array with an integer or floating
+            point dtype of any bit depth. A 2-dimensional array describes single-valued (monochromatic) data.
+            A 3-dimensional array is used to give individual color components. The third dimension must
+            be of length 3 (RGB) or 4 (RGBA).
+        rect: QRectF or QRect or array_like, optional
+            If given, sets translation and scaling to display the image within the
+            specified rectangle. If ``array_like`` should be the form of floats
+            ``[x, y, w, h]`` See :func:`~pyqtgraph.ImageItem.setRect`
+        autoLevels: bool, optional
+            If `True`, ImageItem will automatically select levels based on the maximum and minimum values encountered
+            in the data. For performance reasons, this search subsamples the images and may miss individual bright or
+            or dark points in the data set.
+
+            If `False`, the search will be omitted.
+
+            The default is `False` if a ``levels`` keyword argument is given, and `True` otherwise.
+        levelSamples: int, default 65536
+            When determining minimum and maximum values, ImageItem
+            only inspects a subset of pixels no larger than this number.
+            Setting this larger than the total number of pixels considers all values.
+        levels_sym: bool, optional
+            if true and autolevels is True, will symetrize the levels from -abs(max(min_data, max_data) to abs(max(min_data, max_data)
+        """
+        profile = debug.Profiler()
+
+        gotNewData = False
+        if image is None:
+            if self.image is None:
+                return
+        else:
+            old_xp = self._xp
+            cp = getCupy()
+            self._xp = cp.get_array_module(image) if cp else np
+            gotNewData = True
+            processingSubstrateChanged = old_xp != self._xp
+            if processingSubstrateChanged:
+                self._processingBuffer = None
+            shapeChanged = (processingSubstrateChanged or self.image is None or image.shape != self.image.shape)
+            image = image.view()
+            self.image = image
+            self._imageHasNans = None
+            self._imageNanLocations = None
+            if self.image.shape[0] > 2**15-1 or self.image.shape[1] > 2**15-1:
+                if 'autoDownsample' not in kargs:
+                    kargs['autoDownsample'] = True
+            if shapeChanged:
+                self.prepareGeometryChange()
+                self.informViewBoundsChanged()
+
+        profile()
+
+        if autoLevels is None:
+            if 'levels' in kargs:
+                autoLevels = False
+            else:
+                autoLevels = True
+        if autoLevels:
+            level_samples = kargs.pop('levelSamples', 2**16)
+            mn, mx = self.quickMinMax( targetSize=level_samples )
+            # mn and mx can still be NaN if the data is all-NaN
+            if mn == mx or self._xp.isnan(mn) or self._xp.isnan(mx):
+                mn = 0
+                mx = 255
+            if levels_sym:
+                kargs['levels'] = [-max(abs(mn),abs(mx)), max(abs(mn),abs(mx))]
+            else:
+                kargs['levels'] = [mn,mx]
+
+        profile()
+
+        self.setOpts(update=False, **kargs)
+
+        profile()
+
+        self._renderRequired = True
+        self.update()
+
+        profile()
+
+        if gotNewData:
+            self.sigImageChanged.emit()
+        if self._defferedLevels is not None:
+            levels = self._defferedLevels
+            self._defferedLevels = None
+            self.setLevels((levels))
+
 class SpreadImageItem(PymodaqImage):
     """
     **Bases:** :class:`GraphicsObject <pyqtgraph.GraphicsObject>`
@@ -97,7 +202,7 @@ class SpreadImageItem(PymodaqImage):
             return QtCore.QRectF(0., 0., 0., 0.)
         return QtCore.QRectF(self.image[:, 0].min(), self.image[:, 1].min(), float(self.width()), float(self.height()))
 
-    def setImage(self, image=None, autoLevels=None, **kargs):
+    def setImage(self, image=None, autoLevels=None, levels_sym=False, **kargs):
         """
         Update the image displayed by this item. For more information on how the image
         is processed before displaying, see :func:`makeARGB <pyqtgraph.makeARGB>`
@@ -121,6 +226,8 @@ class SpreadImageItem(PymodaqImage):
         levels             (min, max) The minimum and maximum values to use when rescaling the image
                            data. By default, this will be set to the minimum and maximum values
                            in the image. If the image array has dtype uint8, no rescaling is necessary.
+        levels_sym: bool, optional
+            if true and autolevels is True, will symetrize the levels from -abs(max(min_data, max_data) to abs(max(min_data, max_data)
         opacity            (float 0.0-1.0)
         compositionMode    See :func:`setCompositionMode <pyqtgraph.ImageItem.setCompositionMode>`
         border             Sets the pen used when drawing the image border. Default is None.
@@ -180,7 +287,10 @@ class SpreadImageItem(PymodaqImage):
             if mn == mx:
                 mn = 0
                 mx = 255
-            kargs['levels'] = [mn, mx]
+            if levels_sym:
+                kargs['levels'] = [-max(abs(mn),abs(mx)), max(abs(mn),abs(mx))]
+            else:
+                kargs['levels'] = [mn,mx]
 
         profile()
 
