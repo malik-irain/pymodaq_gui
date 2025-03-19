@@ -32,6 +32,9 @@ class ParameterWithPath(SerializableBase):
             path = get_param_path(parameter)
         self._path = path
 
+    def __repr__(self):
+        return f'Parameter {self.parameter.name()} with path {self.path}'
+
     @property
     def parameter(self) -> Parameter:
         return self._parameter
@@ -39,6 +42,9 @@ class ParameterWithPath(SerializableBase):
     @property
     def path(self) -> List[str]:
         return self._path
+
+    def value(self):
+        return self.parameter.value()
 
     @staticmethod
     def serialize(param: 'ParameterWithPath') -> bytes:
