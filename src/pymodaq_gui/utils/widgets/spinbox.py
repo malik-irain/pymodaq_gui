@@ -10,10 +10,13 @@ class SpinBox(SpinBox):
         super().__init__(*args, **kwargs)
 
         if font_size is not None:
-            font = QtGui.QFont()
-            font.setPointSize(font_size)
-            self.setFont(font)
+            self.set_font_size(font_size)
         self.setMinimumHeight(min_height)
+
+    def set_font_size(self, font_size):
+        font = QtGui.QFont()
+        font.setPointSize(font_size)
+        self.setFont(font)
 
 
 class QSpinBoxWithShortcut(SpinBox):
