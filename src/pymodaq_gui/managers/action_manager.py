@@ -115,13 +115,13 @@ def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip=
     return action
 
 
-def addwidget(klass: Union[str, QtWidgets.QWidget], *args, tip='', toolbar: QtWidgets.QToolBar = None, visible=True,
+def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None, visible=True,
               signal_str=None, slot: Callable=None, setters = {}, **kwargs):
     """Create and eventually add a widget to a toolbar
 
     Parameters
     ----------
-    klass: str or QWidget
+    klass: str or QWidget or QWidget instance
         should be a custom widget class or the name of a standard widget of QWidgets
     args: list
      variable arguments passed as is to the widget constructor
@@ -148,6 +148,8 @@ def addwidget(klass: Union[str, QtWidgets.QWidget], *args, tip='', toolbar: QtWi
             widget: QtWidgets.QWidget = getattr(QtWidgets, klass)(*args)
         else:
             return None
+    elif isinstance(klass, QtWidgets.QWidget):
+        widget = klass
     else:
         try:
             widget = klass(*args, **kwargs)
@@ -252,7 +254,7 @@ class ActionManager:
                                               checked=checked, toolbar=toolbar, menu=menu,
                                               visible=visible, shortcut=shortcut, enabled=enabled)
 
-    def add_widget(self, short_name, klass: Union[str, QtWidgets.QWidget], *args, tip='',
+    def add_widget(self, short_name, klass: Union[str, QtWidgets.QWidget, object], *args, tip='',
                    toolbar: QtWidgets.QToolBar = None, visible=True, signal_str=None,
                    slot: Callable=None, **kwargs):
         """Create and add a widget to a toolbar
@@ -261,7 +263,7 @@ class ActionManager:
         ----------
         short_name: str
             the name as referenced in the dict self.actions
-        klass: str or QWidget
+        klass: str or QWidget or QWidget instance
             should be a custom widget class or the name of a standard widget of QWidgets
         args: list
          variable arguments passed as is to the widget constructor
