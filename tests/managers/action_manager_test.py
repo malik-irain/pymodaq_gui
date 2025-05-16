@@ -56,3 +56,21 @@ def test_icon(qtbot):
             short_name="icon", name="an_icon_from_Qt", icon_name=icon
         )
         assert not is_icon_null(action_manager, "icon")
+
+
+
+def test_action_properties(qtbot):
+    action_manager = ActionManager(toolbar=QtWidgets.QToolBar(), menu=QtWidgets.QMenu())
+
+    action_manager.add_action(short_name="no_icon", name="my_no_icon", icon_name="")
+    action_manager.add_action(
+        short_name="icon_from_pymodaq", name="an_icon_from_pymodaq", icon_name="NewFile"
+    )
+
+    assert action_manager.get_action('no_icon') == action_manager._actions['no_icon']
+
+    assert 'no_icon' in action_manager.actions_names
+    assert 'icon_from_pymodaq' in action_manager.actions_names
+
+    assert action_manager.get_action('no_icon') in action_manager.actions
+    assert isinstance(action_manager.get_action('icon_from_pymodaq'), QtWidgets.QAction)

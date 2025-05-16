@@ -328,6 +328,10 @@ class ActionManager:
     def actions(self) -> List[QAction]:
         return list(self._actions.values())
 
+    @property
+    def actions_names(self) -> list[str]:
+        return list(self._actions.keys())
+
     def get_action(self, name) -> QAction:
         """Getter of a given action
 
