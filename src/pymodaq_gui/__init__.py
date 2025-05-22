@@ -12,16 +12,14 @@ def check_qt_presence():
         import qtpy
 
     except ImportError as e:
-        msg = f"\n\n" \
+        e.msg = f"\n\n" \
               f"****************************************************************************************\n" \
               f"No Qt backend could be found in your system, please install either pyqt6 or pyside6.\n\n" \
               f"pyqt6 is preferred.\n\n" \
               f"do:\n" \
               f"pip install pyqt6\n for instance\n"\
               f"****************************************************************************************\n"
-        warnings.warn(msg, FutureWarning, 2)
-        print(msg)
-        sys.exit()
+        raise e
 
 
 check_qt_presence()
