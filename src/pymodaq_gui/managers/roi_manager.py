@@ -21,7 +21,7 @@ from pyqtgraph import functions as fn
 from pyqtgraph import LinearRegionItem as pgLinearROI
 from pymodaq_utils.utils import plot_colors
 from pymodaq_utils.logger import get_module_name, set_logger
-from pymodaq_gui.config import get_set_roi_path
+from pymodaq_gui.config_saver_loader import get_set_roi_path
 from pymodaq_gui.utils import select_file
 from pymodaq_gui.plotting.utils import plot_utils
 
