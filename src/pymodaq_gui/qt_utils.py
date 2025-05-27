@@ -16,33 +16,6 @@ logger = logger_module.set_logger(logger_module.get_module_name(__file__))
 config = Config()
 
 
-def set_qt_backend():
-    backend_present = True
-    if config('qtbackend', 'backend').lower() not in [mod.lower() for mod in sys.modules]:
-        backend_present = False
-        logger.warning(f"The chosen Qt backend ({config('qtbackend', 'backend')}) has not been installed...\n"
-                       f"Trying another...")
-        backends = config('qtbackend', 'backends')
-        backends.pop(backends.index(config('qtbackend', 'backend')))
-        for backend in backends:
-            if backend.lower() in [mod.lower() for mod in sys.modules]:
-                backend_present = True
-                config['qtbackend', 'backend'] = backend
-                break
-
-    if backend_present:
-        os.environ['QT_API'] = config('qtbackend', 'backend')
-        logger.info('************************')
-        logger.info(f"{config('qtbackend', 'backend')} Qt backend loaded")
-        logger.info('************************')
-    else:
-        msg = f"No Qt backend could be found in your system, please install either pyqt5/6 or pyside2/6." \
-              f"pyqt5 is still preferred, while pyqt6 should mostly work."
-        logger.critical(msg)
-        warnings.warn(msg, FutureWarning, 3)
-        print(msg.upper())
-
-
 def decode_data(encoded_data):
     """
     Decode QbyteArrayData generated when drop items in table/tree/list view

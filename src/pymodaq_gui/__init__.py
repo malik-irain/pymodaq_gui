@@ -1,85 +1,76 @@
 import importlib.util
 import os
 import sys
-from pint import UnitRegistry
-from pathlib import Path
+import pkgutil
 
-import warnings
+def set_and_check_qt_backend_or_die(config):
+    wanted_backend = config('qtbackend', 'backend')
+    backend = wanted_backend
+    #filter to get only qt backend modules
+    available_backends = [mod.name.lower() for mod in pkgutil.iter_modules() \
+                          if mod.name.lower() in [ backend.lower() for backend in config('qtbackend', 'backends')]]
 
+    backend_found = wanted_backend.lower() in available_backends
+    if not backend_found:
+        #trying in the remaining backends and taking the first one
+        logger.warning(f"{backend} is not available. Trying to find another backend.")
+        other_backends = [backend for backend in available_backends if backend != wanted_backend]
+        if len(other_backends) > 0:
+            backend_found = True
+            backend =  other_backends[0]
+            config['qtbackend']['backend'] = backend
 
-def check_qt_presence():
-    try:
-        import qtpy
+    if backend_found:
+        # environment variable is set
+        os.environ['QT_API'] = backend
+        try:
+            import qtpy
+            logger.info(f"{qtpy.API_NAME} Qt backend loaded")
+        except ImportError as e:
+            print(f'Should have selected {backend} for qtpy but still failed:')
+            print(e)
+            sys.exit(-1)
 
-    except ImportError as e:
-        msg = f"\n\n" \
-              f"****************************************************************************************\n" \
-              f"No Qt backend could be found in your system, please install either pyqt6 or pyside6.\n\n" \
-              f"pyqt6 is preferred.\n\n" \
-              f"do:\n" \
-              f"pip install pyqt6\n for instance\n"\
-              f"****************************************************************************************\n"
-        warnings.warn(msg, FutureWarning, 2)
-        print(msg)
-        sys.exit()
+    else:
+        msg = "No Qt backend could be found in your system, please install either pyqt6 or pyside6." \
+              "(pyqt6 is preferred).\n"
+        logger.error(msg)
+        sys.exit(-1)
 
-
-check_qt_presence()
 
 
 try:
-    from pymodaq_utils.logger import set_logger
     from pymodaq_utils.utils import get_version, PackageNotFoundError
-    try:
-        __version__ = get_version(__package__)
-    except PackageNotFoundError:
-        __version__ = '0.0.0dev'
-    try:
-        logger = set_logger('pymodaq_gui', base_logger=False)
-        logger.info('')
-        logger.info('')
-        logger.info('****************************')
-        logger.info('Starting PyMoDAQ GUI modules')
-        logger.info('****************************')
-        logger.info('')
-        logger.info('')
-
-        # in a try statement for compilation on readthedocs server but if this fail, you cannot use the code
-        from pymodaq_gui.plotting import data_viewers  # imported here as to avoid circular imports later on
-        from pymodaq_gui.qt_utils import setLocale, set_qt_backend
-
-        from pymodaq_utils.config import Config
-        from pymodaq_data.plotting.plotter.plotter import register_plotter, PlotterFactory
-
-        config = Config()  # to ckeck for config file existence, otherwise create one
-
-        logger.info('************************')
-        logger.info(f"Setting Qt backend to: {config['qtbackend']['backend']} ...")
-        set_qt_backend()
-        logger.info('************************')
-        logger.info('')
-        logger.info('')
-        logger.info('************************')
-        logger.info(f"Setting Locale to {config['style']['language']} / {config['style']['country']}")
-        logger.info('************************')
-        setLocale()
-        logger.info('')
-        logger.info('')
-
-        logger.info('')
-        logger.info('')
-        logger.info('************************')
-        logger.info(f"Registering PyMoDAQ qt plotters...")
-        register_plotter(parent_module_name='pymodaq_gui.plotting.plotter')
-        logger.info(f"Done")
-        logger.info('************************')
-
-    except Exception:
-        print("Couldn't create the local folder to store logs , presets...")
+    __version__ = get_version(__package__)
+except PackageNotFoundError:
+    __version__ = '0.0.0dev'
 
 
-except Exception as e:
-    try:
-        logger.exception(str(e))
-    except Exception as e:
-        print(str(e))
+from pymodaq_utils.config import Config
+config = Config()  # to check for config file existence, otherwise create one
+
+from pymodaq_utils.logger import set_logger
+logger = set_logger('pymodaq_gui', base_logger=False)
+
+logger.info('Starting PyMoDAQ GUI modules')
+logger.info(f"Trying to set Qt backend to: {config['qtbackend']['backend']}")
+set_and_check_qt_backend_or_die(config)
+
+
+from pymodaq_gui.qt_utils import setLocale
+
+from pymodaq_data.plotting.plotter.plotter import register_plotter, PlotterFactory
+
+logger.info(f"Setting Locale to {config['style']['language']} / {config['style']['country']}")
+setLocale()
+
+logger.info(f"Registering PyMoDAQ qt plotters...")
+
+register_plotter(parent_module_name='pymodaq_gui.plotting.plotter')
+
+logger.info(f"Done")
+
+# in a try statement for compilation on readthedocs server but if this fail, you cannot use the code
+from pymodaq_gui.plotting import data_viewers  # imported here as to avoid circular imports later on
+
+

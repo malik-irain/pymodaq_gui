@@ -6,7 +6,7 @@ import toml
 
 from pymodaq_utils import config as config_mod
 from pyqtgraph.parametertree import Parameter
-from pymodaq_gui.config import ConfigSaverLoader, get_set_roi_path
+from pymodaq_gui.config_saver_loader import ConfigSaverLoader, get_set_roi_path
 
 
 class CustomConfig(config_mod.BaseConfig):
