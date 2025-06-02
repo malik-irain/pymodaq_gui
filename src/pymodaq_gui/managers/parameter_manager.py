@@ -101,7 +101,7 @@ class ParameterManager:
         self.settings = Parameter.create(name=settings_name, type='group', children=self.params,
                                          showTop=False)  # create a Parameter
         # object containing the settings defined in the preamble
-        self._settings_tree.tree.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self._settings_tree.tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
     @property
     def settings_tree(self):
