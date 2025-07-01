@@ -35,6 +35,7 @@ def set_and_check_qt_backend_or_die(config):
         msg = "No Qt backend could be found in your system, please install either pyqt6 or pyside6." \
               "(pyqt6 is preferred).\n"
         logger.error(msg)
+        print(msg)
         sys.exit(-1)
 
 
