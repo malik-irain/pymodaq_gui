@@ -17,7 +17,7 @@ from pymodaq_utils import utils
 from pymodaq_gui.managers.action_manager import ActionManager
 from pymodaq_gui.plotting.data_viewers.viewer import ViewerBase
 from pymodaq_gui.plotting.utils.plot_utils import make_dashed_pens, RoiInfo
-from pymodaq_gui.managers.roi_manager import ROIManager
+from pymodaq_gui.managers.roi_manager import ROIManager, LinearROI
 from pymodaq_gui.plotting.utils.filter import Filter1DFromCrosshair, Filter1DFromRois
 from pymodaq_gui.plotting.widgets import PlotWidget
 from pymodaq_gui.plotting.data_viewers.viewer0D import Viewer0D
@@ -269,7 +269,7 @@ class View1D(ActionManager, QObject):
         self.crosshair: Crosshair = None
 
         self.roi_target = pg.InfiniteLine(pen='w')
-        self.ROIselect = pg.LinearRegionItem(pen='w')
+        self.ROIselect = LinearROI(pen='w')
 
         self.setup_actions()
 
