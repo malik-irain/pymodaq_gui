@@ -39,9 +39,9 @@ class TreeFromToml(QObject):
         self.dialog.setLayout(QtWidgets.QVBoxLayout())
         buttonBox = QtWidgets.QDialogButtonBox(parent=self.dialog)
 
-        buttonBox.addButton('Save', buttonBox.AcceptRole)
+        buttonBox.addButton('Save', buttonBox.ButtonRole.AcceptRole)
         buttonBox.accepted.connect(self.dialog.accept)
-        buttonBox.addButton('Cancel', buttonBox.RejectRole)
+        buttonBox.addButton('Cancel', buttonBox.ButtonRole.RejectRole)
         buttonBox.rejected.connect(self.dialog.reject)
 
         self.dialog.layout().addWidget(self.settings_tree)
@@ -49,7 +49,7 @@ class TreeFromToml(QObject):
         self.dialog.setWindowTitle('Configuration entries')
         res = self.dialog.exec()
 
-        if res == self.dialog.Accepted:
+        if res == self.dialog.DialogCode.Accepted:
             with open(self._config.config_path, 'w') as f:
                 config_dict = self.param_to_dict(self.settings)
                 config_dict.pop('config_path')
