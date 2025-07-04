@@ -72,7 +72,10 @@ class TreeFromToml(QObject):
                     pdt = datetime.fromtimestamp(qdt.toSecsSinceEpoch())
                     config[child.name()] = pdt.date()
                 elif child.opts['type'] == 'list':
-                    config[child.name()] = child.opts['limits']
+                    if child.opts['value'] in child.opts['limits']:
+                        child.opts["limits"].remove(child.opts['value'])
+                        child.opts["limits"].insert(0,child.opts["value"])
+                    config[child.name()] = child.opts["limits"]
                 else:
                     config[child.name()] = child.value()
         return config
