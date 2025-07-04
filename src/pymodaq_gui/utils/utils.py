@@ -24,6 +24,7 @@ here = Path(__file__).parent
 custom_folder = here.parent.joinpath('QtDesigner_Ressources/custom/')
 QtCore.QDir.addSearchPath('custom', str(custom_folder))
 
+
 def set_dark_palette(app):
     from qtpy.QtGui import QPalette, QColor
     app.setStyle("Fusion")

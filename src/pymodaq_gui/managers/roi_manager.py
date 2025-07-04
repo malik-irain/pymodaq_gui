@@ -35,6 +35,7 @@ logger = set_logger(get_module_name(__file__))
 translate = QtCore.QCoreApplication.translate
 
 
+ROI_NAME_PREFIX = 'ROI_'
 ROI2D_TYPES = ['RectROI', 'EllipseROI', 'CircularROI']
 
 ROI_NAME_PREFIX = 'ROI_'
