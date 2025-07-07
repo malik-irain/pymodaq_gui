@@ -64,12 +64,12 @@ class TreeFromToml(QObject):
                 config[child.name()] = cls.param_to_dict(child)
             else:
                 if child.opts['type'] == 'datetime':
-                    config[child.name()] = datetime.fromtimestamp(
+                    config[child.name()] = datetime.datetime.fromtimestamp(
                         child.value().toSecsSinceEpoch())  # convert QDateTime to python datetime
                 elif child.opts['type'] == 'date':
                     qdt = QtCore.QDateTime()
                     qdt.setDate(child.value())
-                    pdt = datetime.fromtimestamp(qdt.toSecsSinceEpoch())
+                    pdt = datetime.datetime.fromtimestamp(qdt.toSecsSinceEpoch())
                     config[child.name()] = pdt.date()
                 elif child.opts['type'] == 'list':
                     if child.opts['value'] in child.opts['limits']:
