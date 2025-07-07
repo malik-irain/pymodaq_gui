@@ -108,6 +108,6 @@ class TreeFromToml(QObject):
                     param['type'] = 'list'
                     param['limits'] = config[key]
                     param['value'] = config[key][0]
-                    param['show_pb'] = True
+                    # param['show_pb'] = True # If True, this allows the user to change the limits in the list from the GUI. No need for now.
                 params.append(param)
         return params
