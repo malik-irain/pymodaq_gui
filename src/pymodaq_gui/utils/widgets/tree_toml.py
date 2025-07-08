@@ -49,7 +49,7 @@ class TreeFromToml(QObject):
         self.dialog.setWindowTitle('Configuration entries')
         res = self.dialog.exec()
 
-        if res == self.dialog.DialogCode.Accepted:
+        if res == QtWidgets.QDialog.DialogCode.Accepted:
             with open(self._config.config_path, 'w') as f:
                 config_dict = self.param_to_dict(self.settings)
                 config_dict.pop('config_path')

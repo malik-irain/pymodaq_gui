@@ -21,7 +21,7 @@ def messagebox(severity='warning', title='this is a title', text='blabla'):
     assert severity in MESSAGE_SEVERITIES
     messbox = getattr(QtWidgets.QMessageBox, severity)
     ret = messbox(None, title, text)
-    return ret == QtWidgets.QMessageBox.Ok
+    return ret == QtWidgets.QMessageBox.StandardButton.Ok
 
 
 def dialog(title='', message='', widget=None):
@@ -29,10 +29,10 @@ def dialog(title='', message='', widget=None):
     dlg.setWindowTitle(title)
     dlg.setLayout(QtWidgets.QVBoxLayout())
     label = QtWidgets.QLabel(message)
-    label.setAlignment(QtCore.Qt.AlignCenter)
+    label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     dlg.layout().addWidget(label)
     dlg.layout().addWidget(widget)
-    button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+    button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
     dlg.layout().addWidget(button_box)
     button_box.accepted.connect(dlg.accept)
     button_box.rejected.connect(dlg.reject)

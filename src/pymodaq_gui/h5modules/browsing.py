@@ -362,11 +362,14 @@ class H5Browser(QObject, ActionManager):
     def show_about(self):
         splash_path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'splash.png')
         splash = QtGui.QPixmap(splash_path)
-        self.splash_sc = QtWidgets.QSplashScreen(splash, QtCore.Qt.WindowStaysOnTopHint)
+        self.splash_sc = QtWidgets.QSplashScreen(splash, QtCore.Qt.WindoWindowStaysOnTopHint)
         self.splash_sc.setVisible(True)
-        self.splash_sc.showMessage(f"PyMoDAQ version {utils.get_version()}\n"
-                                   f"Modular Acquisition with Python\nWritten by Sébastien Weber",
-                                   QtCore.Qt.AlignRight, QtCore.Qt.white)
+        self.splash_sc.showMessage(
+            f"PyMoDAQ version {utils.get_version()}\n"
+            f"Modular Acquisition with Python\nWritten by Sébastien Weber",
+            QtCore.Qt.AlignmentFlag.AlignRight,
+            QtCore.Qt.GlobalColor.white,
+        )
 
     @staticmethod
     def show_log():
@@ -520,9 +523,9 @@ def browse_data(fname=None, ret_all=False, message=None) -> Tuple[data_saving.Da
         dialog.setLayout(vlayout)
         buttonBox = QtWidgets.QDialogButtonBox(parent=dialog)
 
-        buttonBox.addButton('OK', buttonBox.AcceptRole)
+        buttonBox.addButton("OK", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
         buttonBox.accepted.connect(dialog.accept)
-        buttonBox.addButton('Cancel', buttonBox.RejectRole)
+        buttonBox.addButton("Cancel", QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
         buttonBox.rejected.connect(dialog.reject)
         vlayout.addWidget(buttonBox)
 
@@ -533,7 +536,7 @@ def browse_data(fname=None, ret_all=False, message=None) -> Tuple[data_saving.Da
             dialog.setWindowTitle(message)
         res = dialog.exec()
 
-        if res == dialog.Accepted:
+        if res == QtWidgets.QDialog.DialogCode.Accepted:
             node_path = browser.current_node_path
             data = dataloader.load_data(node_path, with_bkg=True)
         else:
