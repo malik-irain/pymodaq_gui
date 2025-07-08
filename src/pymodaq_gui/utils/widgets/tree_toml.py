@@ -39,9 +39,9 @@ class TreeFromToml(QObject):
         self.dialog.setLayout(QtWidgets.QVBoxLayout())
         buttonBox = QtWidgets.QDialogButtonBox(parent=self.dialog)
 
-        buttonBox.addButton('Save', buttonBox.ButtonRole.AcceptRole)
+        buttonBox.addButton('Save', QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
         buttonBox.accepted.connect(self.dialog.accept)
-        buttonBox.addButton('Cancel', buttonBox.ButtonRole.RejectRole)
+        buttonBox.addButton("Cancel", QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
         buttonBox.rejected.connect(self.dialog.reject)
 
         self.dialog.layout().addWidget(self.settings_tree)
