@@ -31,9 +31,6 @@ class TreeFromToml(QObject):
                                          children=params)
         self.settings_tree = ParameterTree()
         self.settings_tree.setParameters(self.settings, showTop=False)
-        self.settings_tree.header().setSectionResizeMode(
-            QtWidgets.QHeaderView.ResizeMode.ResizeToContents
-        )
 
     def show_dialog(self) -> bool:
 
