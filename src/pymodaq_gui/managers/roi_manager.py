@@ -67,16 +67,16 @@ class ROIPositionMapper(QtWidgets.QWidget):
         dialog.setLayout(vlayout)
 
         buttonBox = QtWidgets.QDialogButtonBox(parent=self)
-        buttonBox.addButton('Apply', buttonBox.AcceptRole)
+        buttonBox.addButton("Apply", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
         buttonBox.accepted.connect(dialog.accept)
-        buttonBox.addButton('Cancel', buttonBox.RejectRole)
+        buttonBox.addButton("Cancel", QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
         buttonBox.rejected.connect(dialog.reject)
 
         vlayout.addWidget(buttonBox)
         self.setWindowTitle('Set Precise positions for the ROI')
         res = dialog.exec()
 
-        if res == dialog.Accepted:
+        if res == QtWidgets.QDialog.DialogCode.Accepted:
 
             return self.settings
         else:
@@ -642,9 +642,9 @@ class ROISaver:
             msgBox = QtWidgets.QMessageBox()
             msgBox.setText("ROI Manager?")
             msgBox.setInformativeText("What do you want to do?")
-            cancel_button = msgBox.addButton(QtWidgets.QMessageBox.Cancel)
-            modify_button = msgBox.addButton('Modify', QtWidgets.QMessageBox.AcceptRole)
-            msgBox.setDefaultButton(QtWidgets.QMessageBox.Cancel)
+            cancel_button = msgBox.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
+            modify_button = msgBox.addButton('Modify', QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+            msgBox.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Cancel)
             ret = msgBox.exec()
 
             if msgBox.clickedButton() == modify_button:
@@ -734,7 +734,7 @@ class ROISaver:
         dialog.setWindowTitle('Fill in information about this manager')
         res = dialog.exec()
 
-        if res == dialog.Accepted:
+        if res == QtWidgets.QDialog.DialogCode.Accepted:
             # save managers parameters in a xml file
             # start = os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
             # start = os.path.join("..",'daq_scan')

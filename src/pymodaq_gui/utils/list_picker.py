@@ -20,9 +20,9 @@ class ListPicker(QObject):
         self.dialog.setLayout(vlayout)
 
         buttonBox = QtWidgets.QDialogButtonBox()
-        buttonBox.addButton('Apply', buttonBox.AcceptRole)
+        buttonBox.addButton("Apply", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
         buttonBox.accepted.connect(self.dialog.accept)
-        buttonBox.addButton('Cancel', buttonBox.RejectRole)
+        buttonBox.addButton('Cancel', QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
         buttonBox.rejected.connect(self.dialog.reject)
 
         vlayout.addWidget(buttonBox)
@@ -31,7 +31,7 @@ class ListPicker(QObject):
         res = self.dialog.show()
 
         pass
-        if res == self.dialog.Accepted:
+        if res == QtWidgets.QDialog.DialogCode.Accepted:
             # save managers parameters in a xml file
             return [self.list_widget.currentIndex(), self.list_widget.currentItem().text()]
         else:
