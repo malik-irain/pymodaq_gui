@@ -96,6 +96,7 @@ class ViewerDispatcher:
             dockarea = DockArea()
             dockarea.show()
         self.dockarea = dockarea
+        self.dockarea.setWindowTitle(title)
 
         self._direction = direction
 
