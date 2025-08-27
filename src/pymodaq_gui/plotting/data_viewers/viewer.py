@@ -88,7 +88,7 @@ class ViewerDispatcher:
     def __init__(self, dockarea: DockArea = None, title: str = '', next_to_dock: Dock = None,
                  direction='right'):
         super().__init__()
-        self._title = title
+        self._title = title if title != '' else self.__class__.__name__
 
         self._next_to_dock = next_to_dock
 
