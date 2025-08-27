@@ -18,7 +18,7 @@ from pymodaq_gui.managers.action_manager import QAction
 
 from pymodaq_utils.utils import plot_colors
 from pymodaq_utils.logger import get_module_name, set_logger
-from pymodaq_gui.config import get_set_roi_path
+from pymodaq_gui.config_saver_loader import get_set_roi_path
 from pymodaq_gui.utils import select_file
 from pymodaq_gui.plotting.items.roi import RectROI,LinearROI,EllipseROI,CircularROI,ROI
 
@@ -406,7 +406,7 @@ class ROIManager(QObject):
             self.emit_colors()
         elif parent_name == 'center':
             center = roi.center()
-            pos = self.update_roi_pos(center,param)
+            pos = self.update_roi_pos(center, param)
             if self.ROI_type =='1D':
                 roi.set_positions()
                 pos.sort()
@@ -414,7 +414,7 @@ class ROIManager(QObject):
                 roi.set_center(pos)
         elif parent_name == 'position':
             position = roi.pos()
-            pos = self.update_roi_pos(position,param)                        
+            pos = self.update_roi_pos(position, param)
             if self.ROI_type =='1D':
                 pos = np.sort(pos) #Subclass pg.Point to implement sort?
                 roi.setPos(pos) 
@@ -436,7 +436,6 @@ class ROIManager(QObject):
 
         self.update_roi_tree(roi)
         roi.signalBlocker.unblock()
-
 
     def update_roi_pos(self, pos, param):
         if param.name() == 'x' or param.name() == 'left':
