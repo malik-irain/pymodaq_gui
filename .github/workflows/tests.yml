@@ -78,7 +78,7 @@ jobs:
         id: tests
         run: |
           mkdir coverage
-          pytest -vv --cov=pymodaq_gui -n auto
+          pytest -vv --cov=pymodaq_gui -n 1
           mv .coverage coverage/coverage_${{ matrix.os }}_${{ matrix.python-version }}_${{ matrix.qt-backend }}
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4.6.2
