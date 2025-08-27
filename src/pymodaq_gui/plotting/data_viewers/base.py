@@ -175,6 +175,8 @@ class ViewerBase(QObject):
             parent.show()
         self.parent = parent
 
+        self.parent.setWindowTitle(self.title)
+
         self._display_temporary = False
 
     @property
