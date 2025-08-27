@@ -56,7 +56,6 @@ class ItemSelect(QtWidgets.QListWidget):
         if self.hasCheckbox:
             item.setCheckState(QtCore.Qt.CheckState(int(2*bool(not item.checkState().value))))
 
-
     def get_value(self):
         """
             Get the dictionnary of values contained in the QtWidget attribute.
@@ -102,7 +101,6 @@ class ItemSelect(QtWidgets.QListWidget):
         """        
         if self.hasCheckbox:
             item.setCheckState(QtCore.Qt.CheckState(int(2*doSelect)))  # 2=QtCore.Qt.Checked, 0=QtCore.Qt.Unchecked
-
         else:
             item.setSelected(doSelect)
 

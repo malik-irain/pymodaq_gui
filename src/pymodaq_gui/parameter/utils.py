@@ -187,6 +187,7 @@ def compareValuesParameter(param1:Parameter,param2:Parameter,)-> bool:
 
 def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_filter=False)-> list:
 
+
     """
     Get a list of parameters' name under a given Parameter (see iter_children_params)
 
