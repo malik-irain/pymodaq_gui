@@ -30,7 +30,7 @@ jobs:
     env:
       DISPLAY: ':99'
       QT_DEBUG_PLUGINS: 1
-
+      QT_QPA_PLATFORM: offscreen
     steps:     
       # Get the branch name for the badge generation
       - name: Extract branch name
@@ -71,18 +71,14 @@ jobs:
         run: |
           set QT_DEBUG_PLUGINS=1
           set QT_QPA_PLATFORM=offscreen
-      - name: Fake xvfb-run on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
+      - name: Setup Xvfb on linux
+        if: runner.os == 'Linux'
         run: |
-          # Create a batch file that just forwards arguments
-          echo '@echo off' > xvfb-run.bat
-          echo %* >> xvfb-run.bat
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          /usr/bin/Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
-          # Move it somewhere and add that directory to PATH
-          mkdir $env:USERPROFILE\bin
-          move xvfb-run.bat $env:USERPROFILE\bin\xvfb-run.bat
-          echo "$env:USERPROFILE\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
       - name: Linting with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -91,7 +87,7 @@ jobs:
         id: tests
         run: |
           mkdir coverage
-          xvfb-run pytest -vv --cov=pymodaq_gui -n 1
+          pytest -vv --cov=pymodaq_gui
           mv .coverage coverage/coverage_${{ matrix.os }}_${{ matrix.python-version }}_${{ matrix.qt-backend }}
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4.6.2
