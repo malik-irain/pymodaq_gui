@@ -11,6 +11,8 @@ import tempfile
 from pathlib import Path
 from itertools import permutations
 
+from qtpy.QtWidgets import QApplication
+
 from pymodaq_utils import math_utils as mutils
 from pymodaq_data import data as datamod
 from pymodaq_data.h5modules.saving import H5SaverLowLevel
@@ -96,7 +98,8 @@ class Test1DPlot:
         assert dwa_1D.dim.name == 'Data1D'
         assert dwa_1D.shape == (NX,)
 
-        viewer = dwa_1D.plot('qt')
+        viewer = dwa_1D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer1D)
 
         with tempfile.TemporaryDirectory() as d:
@@ -121,7 +124,8 @@ class Test1DPlot:
         assert dwa_1D.dim.name == 'DataND'
         assert dwa_1D.shape == (NX,)
 
-        viewer = dwa_1D.plot('qt')
+        viewer = dwa_1D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer1D)
         with tempfile.TemporaryDirectory() as d:
             with DataSaverLoader(Path(d).joinpath('mydatafile.h5')) as saver_loader:
@@ -162,7 +166,8 @@ class Test1DPlot:
 
                 assert data1D_spread.inav[-1] == data0D
 
-                viewer = data1D_spread.plot('qt')
+                viewer = data1D_spread.plot('matplotlib')
+                QApplication.processEvents()
                 assert isinstance(viewer, Viewer1D)
 
     def test_plot_0D_1D_spread(self, qtbot, get_h5saver):
@@ -181,17 +186,20 @@ class Test1DPlot:
 
         dwa_back = data_saver.load_data('/RawData/EnlData00', load_all=True)
         assert dwa_back.inav[0] == data_to_append
-        dwa_back.plot('qt')
+        dwa_back.plot('matplotlib')
+        QApplication.processEvents()
 
         data_saver.add_data('/RawData', data_to_append, axis_values=[axis_value+1])
         dwa_back = data_saver.load_data('/RawData/EnlData00', load_all=True)
         assert dwa_back.inav[1] == data_to_append
-        dwa_back.plot('qt')
+        dwa_back.plot('matplotlib')
+        QApplication.processEvents()
 
         data_saver.add_data('/RawData', data_to_append, axis_values=[axis_value + 2])
         dwa_back = data_saver.load_data('/RawData/EnlData00', load_all=True)
         assert dwa_back.inav[2] == data_to_append
-        viewer = dwa_back.plot('qt')
+        viewer = dwa_back.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, ViewerND)
 
 class Test2DPlot:
@@ -208,7 +216,8 @@ class Test2DPlot:
         print(data2D)
         assert data2D.distribution == 'uniform'
         assert data2D.dim == 'Data2D'
-        viewer = data2D.plot('qt')
+        viewer = data2D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer2D)
 
     @pytest.mark.parametrize('nav_index', (0, 1))
@@ -226,7 +235,8 @@ class Test2DPlot:
         print(data2D)
         assert data2D.distribution == 'uniform'
         assert data2D.dim == 'DataND'
-        viewer = data2D.plot('qt')
+        viewer = data2D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer2D)
 
     def test_plot_2D_0D_uniform(self, qtbot):
@@ -243,7 +253,8 @@ class Test2DPlot:
         print(data2D)
         assert data2D.distribution == 'uniform'
         assert data2D.dim == 'DataND'
-        viewer = data2D.plot('qt')
+        viewer = data2D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer2D)
 
     def test_plot_2D_0D_spread(self, qtbot):
@@ -268,7 +279,8 @@ class Test2DPlot:
         assert data2D_spread.distribution == 'spread'
         assert data2D_spread.dim == 'DataND'
 
-        viewer = data2D_spread.plot('qt')
+        viewer = data2D_spread.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, Viewer2D)
 
     def test_plot_1D_1D_spread(self, qtbot):
@@ -295,7 +307,8 @@ class Test2DPlot:
         assert data2D_spread.distribution == 'spread'
         assert data2D_spread.dim == 'DataND'
 
-        viewer = data2D_spread.plot('qt')
+        viewer = data2D_spread.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, ViewerND)
 
 class Test3DPlot:
@@ -310,7 +323,8 @@ class Test3DPlot:
         print(data3D)
         assert data3D.distribution == 'uniform'
         assert data3D.dim == 'DataND'
-        viewer = data3D.plot('qt')
+        viewer = data3D.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, ViewerND)
 
 class Test4DPlot:
@@ -324,7 +338,8 @@ class Test4DPlot:
         print(dwa)
         assert dwa.distribution == 'uniform'
         assert dwa.dim == 'DataND'
-        viewer = dwa.plot('qt')
+        viewer = dwa.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, ViewerND)
 
     def test_plot_4D_spread(self, qtbot):
@@ -353,5 +368,6 @@ class Test4DPlot:
                                     axis
                                     ])
 
-        viewer = dwa.plot('qt')
+        viewer = dwa.plot('matplotlib')
+        QApplication.processEvents()
         assert isinstance(viewer, ViewerND)
