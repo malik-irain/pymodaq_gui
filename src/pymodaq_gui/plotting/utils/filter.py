@@ -244,14 +244,15 @@ class Filter1DFromRois(Filter):
                 self.update_axis(axis)
             if data is not None:                                
                 for roi_key, roi in self._ROIs.items():
-                    sub_data = data.deepcopy()                
-                    labels = self._roi_settings['ROIs', roi_key, 'use_channel']['selected']
-                    if labels:
-                        sub_data.data = [sub_data[sub_data.labels.index(label)] for label in labels]
-                        sub_data.labels = [label for label in labels]                
-                    dte_tmp = self.get_data_from_roi(roi, self._roi_settings.child('ROIs', roi_key),
-                                                                    sub_data)
-                    dte.append(dte_tmp)
+                    if roi.compute:
+                        sub_data = data.deepcopy()
+                        labels = self._roi_settings['ROIs', roi_key, 'use_channel']['selected']
+                        if labels:
+                            sub_data.data = [sub_data[sub_data.labels.index(label)] for label in labels]
+                            sub_data.labels = [label for label in labels]
+                        dte_tmp = self.get_data_from_roi(roi, self._roi_settings.child('ROIs', roi_key),
+                                                                        sub_data)
+                        dte.append(dte_tmp)
         except Exception as e:
             logger.warning(f'Issue with the ROI: {str(e)}')
         return dte
@@ -308,16 +309,17 @@ class Filter2DFromRois(Filter):
             try:
                 labels = []
                 for roi_key, roi in self._ROIs.items():
-                    labels = self._roi_settings['ROIs', roi_key, 'use_channel']['selected']
-                    sub_data = dwa.deepcopy()
-                    if labels:
-                        sub_data.data = [dwa[dwa.labels.index(label)] for label in labels]
-                        sub_data.labels = [label for label in labels]
-                        dte_temp = self.get_xydata_from_roi(roi, sub_data,
-                                                                self._roi_settings['ROIs',
-                                                                roi_key, 'math_function'])
+                    if roi.compute:
+                        labels = self._roi_settings['ROIs', roi_key, 'use_channel']['selected']
+                        sub_data = dwa.deepcopy()
+                        if labels:
+                            sub_data.data = [dwa[dwa.labels.index(label)] for label in labels]
+                            sub_data.labels = [label for label in labels]
+                            dte_temp = self.get_xydata_from_roi(roi, sub_data,
+                                                                    self._roi_settings['ROIs',
+                                                                    roi_key, 'math_function'])
 
-                        dte.append(dte_temp)
+                            dte.append(dte_temp)
             except Exception as e:
                 logger.warning(f'Issue with the ROI: {str(e)}')
         return dte
