@@ -252,21 +252,23 @@ class ROIManager(QObject):
                 if data=='Copy':
                     self.copy_ROI(self.ROIs[param.name()])                    
 
-    def make_ROI(self, par,):
-        newindex = int(par.name()[-2:])
+    def make_ROI(self, param: Parameter):
+        newindex = int(param.name()[-2:])
         pos = self.viewer_widget.plotItem.vb.viewRange()
         if self.ROI_type == '1D':
             roi_type = ''
             pos = pos[0]
             pos = pos[0] + np.diff(pos)*np.array([2,4])/6
-            roi = self.make_ROI1D(newindex,pos,brush=par['Color'])
+            roi = self.make_ROI1D(newindex, pos, brush=param['Color'],
+                                  compute=param['process_data'])
         elif self.ROI_type == '2D':
-            roi_type = par.child('roi_type').value()
+            roi_type = param.child('roi_type').value()
             xrange,yrange=pos                    
             width = np.max(((xrange[1] - xrange[0]) / 10, 2))
             height = np.max(((yrange[1] - yrange[0]) / 10, 2))
             pos = [int(np.mean(xrange) - width / 2), int(np.mean(yrange) - width / 2)]
-            roi = self.make_ROI2D(roi_type,index=newindex, pos=pos,size=[width, height],pen=par['Color'])
+            roi = self.make_ROI2D(roi_type, index=newindex, pos=pos,size=[width, height],
+                                  pen=param['Color'], compute=param['process_data'])
 
         return roi
 
@@ -289,11 +291,11 @@ class ROIManager(QObject):
 
     def expand_roi_tree(self, roi,):
         # Expand roi tree when roi gets double selected
-        par = self.settings.child(*('ROIs', roi_format(roi.index)))
-        isExpanded = not par.opts['expanded']    
-        par.setOpts(expanded=isExpanded)                
+        param = self.settings.child(*('ROIs', roi_format(roi.index)))
+        isExpanded = not param.opts['expanded']
+        param.setOpts(expanded=isExpanded)
 
-    def make_ROI1D(self, index, pos, **kwargs):
+    def make_ROI1D(self, index, pos, compute=True, **kwargs):
         """Convenience function to make custom ROI_1D
 
         Args:
@@ -303,12 +305,12 @@ class ROIManager(QObject):
         Returns:
             roi: LinearROI
         """
-        roi = LinearROI(index=index, pos=pos,**kwargs)
+        roi = LinearROI(index=index, pos=pos, compute=compute, **kwargs)
         # roi.setZValue(-10)
         roi.setOpacity(0.2)
         return roi                    
 
-    def make_ROI2D(self, roi_type, index, pos, size, **kwargs):
+    def make_ROI2D(self, roi_type, index, pos, size, compute=True, **kwargs):
         """Convenience function to make custom ROI_2D
 
         Args:
@@ -322,13 +324,16 @@ class ROIManager(QObject):
         """
         if roi_type == 'RectROI':
             roi = RectROI(index=index, pos=pos,
-                          size=size, name=roi_format(index),**kwargs)
+                          size=size, name=roi_format(index),
+                          compute=compute, **kwargs)
         elif roi_type == 'EllipseROI':
             roi = EllipseROI(index=index, pos=pos,
-                             size=size, name=roi_format(index),**kwargs)
+                             size=size, name=roi_format(index),
+                             compute=compute, **kwargs)
         elif roi_type == 'CircularROI':
             roi = CircularROI(index=index, pos=pos,
-                              size=size, name=roi_format(index),**kwargs)
+                              size=size, name=roi_format(index),
+                              compute=compute, **kwargs)
 
         return roi
     

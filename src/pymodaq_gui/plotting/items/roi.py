@@ -32,11 +32,11 @@ def roi_format(index):
 class ROIMixin(QtCore.QObject):
     index_signal = Signal(int)
 
-    def __init__(self, index=0, name='roi'):
+    def __init__(self, index=0, name='roi', compute=True):
         super().__init__()
         self.name = name
         self.index = index
-        self._compute = True
+        self._compute = compute
         self.menu = None
 
         self.signalBlocker = QSignalBlocker(self)
@@ -107,8 +107,8 @@ class ROI(pgROI, ROIMixin):
     sigDoubleClicked = Signal(object, object)
     sigRemoveRequested = Signal(object)
 
-    def __init__(self, *args, index=0, name='roi', **kwargs):
-        ROIMixin.__init__(self, index=index, name=name)
+    def __init__(self, *args, index=0, name='roi', compute=True, **kwargs):
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgROI.__init__(self, *args, **kwargs)
 
     def getMenu(self):
@@ -204,8 +204,8 @@ class LinearROI(pgLinearROI, ROIMixin):
     sigDoubleClicked = Signal(object,object)
     sigRemoveRequested = Signal(object)
 
-    def __init__(self, index=0, pos=[0, 10], name = 'roi', **kwargs):
-        ROIMixin.__init__(self, index=index, name=name)
+    def __init__(self, index=0, pos=[0, 10], name = 'roi', compute=True, **kwargs):
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgLinearROI.__init__(self, values=pos, **kwargs)
 
     def getMenu(self):
