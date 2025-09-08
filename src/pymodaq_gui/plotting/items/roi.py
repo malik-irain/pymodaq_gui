@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List, Tuple, Union, Callable
 
 import numpy as np
 import pyqtgraph as pg
-from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory, DataDim
+from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory
 from pymodaq_utils.logger import get_module_name, set_logger
 from pymodaq_utils.enums import StrEnum
 from pymodaq_utils.math_utils import rotate2D
@@ -29,6 +29,10 @@ ROI_NAME_PREFIX = 'ROI_'
 def roi_format(index):
     return f'{ROI_NAME_PREFIX}{index:02d}'
 
+
+class DataDim(StrEnum):
+    Data1D = 'Data1D'
+    Data2D = 'Data2D'
 
 
 class ROIBase:

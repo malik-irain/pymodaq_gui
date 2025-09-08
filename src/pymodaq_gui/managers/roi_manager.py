@@ -21,12 +21,12 @@ from pymodaq_utils.logger import get_module_name, set_logger
 from pymodaq_utils.config import Config
 from pymodaq_gui.config_saver_loader import get_set_roi_path
 from pymodaq_gui.utils import select_file
-from pymodaq_gui.plotting.items.roi import ROIFactory, ROI, LinearROI, RectROI
+from pymodaq_gui.plotting.items.roi import ROIFactory, ROI, LinearROI, RectROI, DataDim
 
 
 import numpy as np
 from pathlib import Path
-from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory, DataDim
+from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory
 from pymodaq_gui.utils.utils import first_available_integer
 
 data_processors = DataProcessorFactory()
