@@ -1,4 +1,4 @@
-
+from abc import abstractmethod
 from typing import TYPE_CHECKING, List, Tuple, Union
 
 import numpy as np
@@ -29,30 +29,99 @@ def roi_format(index):
     return f'{ROI_NAME_PREFIX}{index:02d}'
 
 
-class ROI(pgROI):
+class ROIMixin(QtCore.QObject):
     index_signal = Signal(int)
-    sigCopyRequested = Signal(object)
-    sigDoubleClicked = Signal(object,object)
 
-    def __init__(self, *args, index=0, name='roi', **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, index=0, name='roi', compute=True):
+        super().__init__()
         self.name = name
         self.index = index
+        self._compute = compute
+        self.menu = None
+
         self.signalBlocker = QSignalBlocker(self)
         self.signalBlocker.unblock()
         self._clipboard = QtGui.QGuiApplication.clipboard()
 
+    def emit_index_signal(self):
+        self.index_signal.emit(self.index)
+
+    @abstractmethod
+    def mouseClickEvent(self, ev):
+        ...
+
+    @abstractmethod
+    def color(self):
+        ...
+
+    @abstractmethod
+    def getMenu(self):
+        ...
+
     def _emitCopyRequest(self):
         self.sigCopyRequested.emit(self)
 
+    def mouseDoubleClickEvent(self, ev):
+        if ev.button() == QtCore.Qt.MouseButton.LeftButton:
+            ev.accept()
+            self.sigDoubleClicked.emit(self, ev)
+
+    @abstractmethod
+    def copy_clipboard(self):
+        ...
+
+    @abstractmethod
+    def center(self):
+        ...
+
+    @abstractmethod
+    def width(self):
+        ...
+    @abstractmethod
+    def height(self):
+        ...
+
+    def key(self) -> str:
+        return roi_format(self.index)
+
+    def type(self) -> str:
+        return type(self).__name__
+
+    def doShow(self, status: bool = True):
+        if status:
+            self.show()
+        else:
+            self.hide()
+
+    @property
+    def compute(self):
+        return self._compute
+
+    @compute.setter
+    def compute(self, compute: bool = True):
+        self._compute = compute
+
+
+class ROI(pgROI, ROIMixin):
+    sigCopyRequested = Signal(object)
+    sigDoubleClicked = Signal(object, object)
+    sigRemoveRequested = Signal(object)
+
+    def __init__(self, *args, index=0, name='roi', compute=True, **kwargs):
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
+        pgROI.__init__(self, *args, **kwargs)
+
+    def getMenu(self):
+        if self.menu is None:
+            self.menu = QtWidgets.QMenu()
+            self.menu.setTitle(translate("ROI", "ROI"))
+            self.menu.addAction('Copy ROI to clipboard', self.copy_clipboard)
+            self.menu.addAction("Copy ROI", self._emitCopyRequest)
+            self.menu.addAction("Remove ROI", self._emitRemoveRequest)
+        return self.menu
+
     def contextMenuEnabled(self):
         return True
-    
-    def mouseClickEvent(self,ev):
-        super().mouseClickEvent(ev)
-        if ev.button() == QtCore.Qt.MouseButton.MiddleButton:
-            ev.accept()
-            self._emitRemoveRequest()
 
     def raiseContextMenu(self, ev):
         menu = self.getMenu()
@@ -60,26 +129,23 @@ class ROI(pgROI):
         pos = ev.screenPos()
         menu.popup(QtCore.QPoint(int(pos.x()), int(pos.y())))
 
-    def getMenu(self):
-        if self.menu is None:
-            self.menu = QtWidgets.QMenu()
-            self.menu.setTitle(translate("ROI", "ROI"))
-            self.menu.addAction('Copy ROI to clipboard', self.copy_clipboard)            
-            self.menu.addAction("Copy ROI",self._emitCopyRequest)
-            self.menu.addAction("Remove ROI",self._emitRemoveRequest)       
-        return self.menu
-    
     def contextMenuEvent(self, event):
         if self.menu is not None:
             self.menu.exec(event.screenPos())
 
-    def mouseDoubleClickEvent(self,ev):
-        if ev.button() == QtCore.Qt.MouseButton.LeftButton:
+    def mouseClickEvent(self, ev):
+        super().mouseClickEvent(ev)
+        if ev.button() == QtCore.Qt.MouseButton.RightButton and self.contextMenuEnabled():
+            self.raiseContextMenu(ev)
             ev.accept()
-            self.sigDoubleClicked.emit(self,ev)
-
-    def emit_index_signal(self):
-        self.index_signal.emit(self.index)
+        elif self.acceptedMouseButtons() & ev.button():
+            ev.accept()
+            self.sigClicked.emit(self, ev)
+        elif ev.button() == QtCore.Qt.MouseButton.MiddleButton:
+            ev.accept()
+            self._emitRemoveRequest()
+        else:
+            ev.ignore()
 
     @property
     def color(self):
@@ -103,17 +169,6 @@ class ROI(pgROI):
     def height(self) -> float:
         return self.size().y()
 
-    def key(self) -> str:
-        return roi_format(self.index)
-    
-    def type(self) -> str:
-        return type(self).__name__    
-    
-    def doShow(self,status,):
-        if status:
-            self.show()
-        else:
-            self.hide()
 
 class ROIBrushable(ROI):
     def __init__(self, brush=None, *args, **kwargs):
@@ -144,34 +199,36 @@ class ROIBrushable(ROI):
         # p.restore()
 
 
-class LinearROI(pgLinearROI):
-    index_signal = Signal(int)
+class LinearROI(pgLinearROI, ROIMixin):
     sigCopyRequested = Signal(object)
     sigDoubleClicked = Signal(object,object)
     sigRemoveRequested = Signal(object)
 
-    def __init__(self, index=0, pos=[0, 10], name = 'roi', **kwargs):
-        super().__init__(values=pos, **kwargs)
-        self.name = name
-        self.index = index
-        self.signalBlocker = QSignalBlocker(self)
-        self.menu = None
-        self._clipboard = QtGui.QGuiApplication.clipboard()
+    def __init__(self, index=0, pos=[0, 10], name = 'roi', compute=True, **kwargs):
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
+        pgLinearROI.__init__(self, values=pos, **kwargs)
 
-    def copy_clipboard(self):
-        info = plot_utils.RoiInfo.info_from_linear_roi(self)
-        self._clipboard.setText(str(info.to_slices()))
-
-
-    def _emitRemoveRequest(self):
-        self.sigRemoveRequested.emit(self)
-
-    def _emitCopyRequest(self):
-        self.sigCopyRequested.emit(self)
+    def getMenu(self):
+        if self.menu is None:
+            self.menu = QtWidgets.QMenu()
+            self.menu.setTitle(translate("ROI", "ROI"))
+            self.menu.addAction('Copy ROI to clipboard', self.copy_clipboard)
+            self.menu.addAction("Copy ROI", self._emitCopyRequest)
+            self.menu.addAction("Remove ROI", self._emitRemoveRequest)
+        return self.menu
 
     def contextMenuEnabled(self):
         return True
-    
+
+    def raiseContextMenu(self, ev):
+        menu = self.getMenu()
+        menu = self.scene().addParentContextMenus(self, menu, ev)
+        pos = ev.screenPos()
+        menu.popup(QtCore.QPoint(int(pos.x()), int(pos.y())))
+
+    def contextMenuEvent(self, event):
+        if self.menu is not None:
+            self.menu.exec(event.screenPos())
 
     def mouseClickEvent(self, ev):
         super().mouseClickEvent(ev)
@@ -187,33 +244,9 @@ class LinearROI(pgLinearROI):
         else:
             ev.ignore()
 
-
-    def raiseContextMenu(self, ev):
-        menu = self.getMenu()
-        menu = self.scene().addParentContextMenus(self, menu, ev)
-        pos = ev.screenPos()
-        menu.popup(QtCore.QPoint(int(pos.x()), int(pos.y())))
-
-    def getMenu(self):
-        if self.menu is None:
-            self.menu = QtWidgets.QMenu()
-            self.menu.setTitle(translate("ROI", "ROI"))
-            self.menu.addAction('Copy ROI to clipboard', self.copy_clipboard)            
-            self.menu.addAction("Copy ROI",self._emitCopyRequest)
-            self.menu.addAction("Remove ROI",self._emitRemoveRequest)       
-        return self.menu
-    
-    def contextMenuEvent(self, event):
-        if self.menu is not None:
-            self.menu.exec(event.screenPos())
-
-    def mouseDoubleClickEvent(self,ev):
-        if ev.button() == QtCore.Qt.MouseButton.LeftButton:
-            ev.accept()
-            self.sigDoubleClicked.emit(self,ev)
-
-    def emit_index_signal(self):
-        self.index_signal.emit(self.index)
+    def copy_clipboard(self):
+        info = plot_utils.RoiInfo.info_from_linear_roi(self)
+        self._clipboard.setText(str(info.to_slices()))
 
     def pos(self) -> Tuple[float, float]:
         return self.getRegion()
@@ -232,17 +265,7 @@ class LinearROI(pgLinearROI):
     def color(self):
         return self.brush.color()
 
-    def emit_index_signal(self):
-        self.index_signal.emit(self.index)
 
-    def key(self,):
-        return roi_format(self.index)
-    
-    def doShow(self,status,):
-        if status:
-            self.show()
-        else:
-            self.hide()
 class EllipseROI(ROI):
     """
     Elliptical ROI subclass with one scale handle and one rotation handle.

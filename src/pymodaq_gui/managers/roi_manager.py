@@ -18,6 +18,7 @@ from pymodaq_gui.managers.action_manager import QAction
 
 from pymodaq_utils.utils import plot_colors
 from pymodaq_utils.logger import get_module_name, set_logger
+from pymodaq_utils.config import Config
 from pymodaq_gui.config_saver_loader import get_set_roi_path
 from pymodaq_gui.utils import select_file
 from pymodaq_gui.plotting.items.roi import RectROI,LinearROI,EllipseROI,CircularROI,ROI
@@ -32,8 +33,7 @@ data_processors = DataProcessorFactory()
 
 roi_path = get_set_roi_path()
 logger = set_logger(get_module_name(__file__))
-translate = QtCore.QCoreApplication.translate
-
+config = Config()
 
 ROI_NAME_PREFIX = 'ROI_'
 ROI2D_TYPES = ['RectROI', 'EllipseROI', 'CircularROI']
@@ -95,6 +95,8 @@ class ROIScalableGroup(GroupParameter):
     def make_ROIParam2D(roi_type, index):
             children = []    
             children.extend([{'title': 'Type', 'name': 'roi_type', 'type': 'list', 'value': roi_type, 'limits':['RectROI','EllipseROI','CircularROI'], 'readonly': False,}])
+            children.append({'title': 'Process data', 'name': 'process_data', 'type': 'led_push',
+                             'value': config.get(('plotting', 'process_roi'), True),})
             children.extend(ROIScalableGroup.makeChannelsParam('2D'))
             children.extend(ROIScalableGroup.makeMathParam('2D'))
             children.extend(ROIScalableGroup.makeDisplayParam(index))
@@ -116,7 +118,9 @@ class ROIScalableGroup(GroupParameter):
 
     @staticmethod    
     def make_ROIParam1D(roi_type, index):
-            children = []    
+            children = []
+            children.append({'title': 'Process data', 'name': 'process_data', 'type': 'led_push',
+                             'value': config.get(('plotting', 'process_roi'), True),})
             children.extend(ROIScalableGroup.makeChannelsParam('1D'))
             children.extend(ROIScalableGroup.makeMathParam('1D'))
             children.extend(ROIScalableGroup.makeDisplayParam(index))
@@ -248,21 +252,23 @@ class ROIManager(QObject):
                 if data=='Copy':
                     self.copy_ROI(self.ROIs[param.name()])                    
 
-    def make_ROI(self, par,):
-        newindex = int(par.name()[-2:])
+    def make_ROI(self, param: Parameter):
+        newindex = int(param.name()[-2:])
         pos = self.viewer_widget.plotItem.vb.viewRange()
         if self.ROI_type == '1D':
             roi_type = ''
             pos = pos[0]
             pos = pos[0] + np.diff(pos)*np.array([2,4])/6
-            roi = self.make_ROI1D(newindex,pos,brush=par['Color'])
+            roi = self.make_ROI1D(newindex, pos, brush=param['Color'],
+                                  compute=param['process_data'])
         elif self.ROI_type == '2D':
-            roi_type = par.child('roi_type').value()
+            roi_type = param.child('roi_type').value()
             xrange,yrange=pos                    
             width = np.max(((xrange[1] - xrange[0]) / 10, 2))
             height = np.max(((yrange[1] - yrange[0]) / 10, 2))
             pos = [int(np.mean(xrange) - width / 2), int(np.mean(yrange) - width / 2)]
-            roi = self.make_ROI2D(roi_type,index=newindex, pos=pos,size=[width, height],pen=par['Color'])
+            roi = self.make_ROI2D(roi_type, index=newindex, pos=pos,size=[width, height],
+                                  pen=param['Color'], compute=param['process_data'])
 
         return roi
 
@@ -277,7 +283,7 @@ class ROIManager(QObject):
         # Updating tree
         self.update_roi_tree(roi)
         # Adding to dictionnary
-        self.ROIs[roi.key()]=roi 
+        self.ROIs[roi.key()] = roi
         # Adding to viewer
         self.viewer_widget.plotItem.addItem(roi)  
         # Emitting signal
@@ -285,12 +291,11 @@ class ROIManager(QObject):
 
     def expand_roi_tree(self, roi,):
         # Expand roi tree when roi gets double selected
-        par = self.settings.child(*('ROIs', roi_format(roi.index)))
-        isExpanded = not par.opts['expanded']    
-        par.setOpts(expanded=isExpanded)                
+        param = self.settings.child(*('ROIs', roi_format(roi.index)))
+        isExpanded = not param.opts['expanded']
+        param.setOpts(expanded=isExpanded)
 
-
-    def make_ROI1D(self, index, pos, **kwargs):
+    def make_ROI1D(self, index, pos, compute=True, **kwargs):
         """Convenience function to make custom ROI_1D
 
         Args:
@@ -300,12 +305,12 @@ class ROIManager(QObject):
         Returns:
             roi: LinearROI
         """
-        roi = LinearROI(index=index, pos=pos,**kwargs)
+        roi = LinearROI(index=index, pos=pos, compute=compute, **kwargs)
         # roi.setZValue(-10)
         roi.setOpacity(0.2)
         return roi                    
 
-    def make_ROI2D(self, roi_type, index, pos, size, **kwargs):
+    def make_ROI2D(self, roi_type, index, pos, size, compute=True, **kwargs):
         """Convenience function to make custom ROI_2D
 
         Args:
@@ -319,13 +324,16 @@ class ROIManager(QObject):
         """
         if roi_type == 'RectROI':
             roi = RectROI(index=index, pos=pos,
-                                size=size, name=roi_format(index),**kwargs)
+                          size=size, name=roi_format(index),
+                          compute=compute, **kwargs)
         elif roi_type == 'EllipseROI':
             roi = EllipseROI(index=index, pos=pos,
-                                size=size, name=roi_format(index),**kwargs)
+                             size=size, name=roi_format(index),
+                             compute=compute, **kwargs)
         elif roi_type == 'CircularROI':
             roi = CircularROI(index=index, pos=pos,
-                                    size=size, name=roi_format(index),**kwargs)
+                              size=size, name=roi_format(index),
+                              compute=compute, **kwargs)
 
         return roi
     
@@ -346,7 +354,7 @@ class ROIManager(QObject):
         self.remove_ROI_signal.emit(roi.key())
         self.emit_colors()
 
-    def copy_ROI(self, roi:ROI):
+    def copy_ROI(self, roi: ROI):
         """Method to copy a ROI and add it to the parameter tree and to the viewer widget
         The method extracts the parameters of the copied ROI, create a new parameter, a new ROI and update it with the settings from the copied parameter
         Args:
@@ -388,7 +396,7 @@ class ROIManager(QObject):
                 param.setValue(dict(all_items=channels,
                         selected=channels))   
                     
-    def update_roi(self, roi:ROI, param):
+    def update_roi(self, roi: ROI, param: Parameter):
         par = self.get_parameter(roi)
         roi.signalBlocker.reblock()
         parent_name = param.parent().opts['name']
@@ -433,6 +441,8 @@ class ROIManager(QObject):
         elif param.name() == 'height':
             size = roi.size()
             roi.setSize((size[0], param.value()))
+        elif param.name() == 'process_data':
+            roi.compute = param.value()
 
         self.update_roi_tree(roi)
         roi.signalBlocker.unblock()
