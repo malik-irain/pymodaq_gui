@@ -21,12 +21,12 @@ from pymodaq_utils.logger import get_module_name, set_logger
 from pymodaq_utils.config import Config
 from pymodaq_gui.config_saver_loader import get_set_roi_path
 from pymodaq_gui.utils import select_file
-from pymodaq_gui.plotting.items.roi import RectROI,LinearROI,EllipseROI,CircularROI,ROI
+from pymodaq_gui.plotting.items.roi import ROIFactory, ROI, LinearROI, RectROI
 
 
 import numpy as np
 from pathlib import Path
-from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory
+from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory, DataDim
 from pymodaq_gui.utils.utils import first_available_integer
 
 data_processors = DataProcessorFactory()
@@ -35,19 +35,21 @@ roi_path = get_set_roi_path()
 logger = set_logger(get_module_name(__file__))
 config = Config()
 
-ROI_NAME_PREFIX = 'ROI_'
-ROI2D_TYPES = ['RectROI', 'EllipseROI', 'CircularROI']
 
 ROI_NAME_PREFIX = 'ROI_'
+ROI2D_TYPES = ROIFactory.get_descriptors_from_dimensionality(DataDim.Data2D)
+
+
 def roi_format(index):
     return f'{ROI_NAME_PREFIX}{index:02d}'
 
+
 class ROIScalableGroup(GroupParameter):
-    def __init__(self, roi_type='1D', **opts):
+    def __init__(self, roi_type = DataDim.Data1D, **opts):
         opts['type'] = 'group'
         opts['addText'] = "Add"
         self.roi_type = roi_type
-        if roi_type != '1D':
+        if roi_type == DataDim.Data2D:
             opts['addList'] = ROI2D_TYPES
         # self.color_list = ROIManager.color_list
         super().__init__(**opts)
@@ -60,20 +62,20 @@ class ROIScalableGroup(GroupParameter):
         else:
             newindex = max(child_indexes) + 1
 
-        self.addChild(self.makeChild(newindex,typ))
+        self.addChild(self.makeChild(newindex, typ))
 
 
-    def makeChild(self, index, roi_type):
+    def makeChild(self, index, descriptor: str):
         child = {'name': ROIManager.roi_format(index), 'type': 'bool','value':True, 'removable': True, 'renamable': False, 'expanded': False,'context':['Copy',]}
-        if self.roi_type =='2D':
-            child['children'] = ROIScalableGroup.make_ROIParam2D(roi_type,index)
-        elif self.roi_type =='1D':
-            child['children'] = ROIScalableGroup.make_ROIParam1D(roi_type,index)
+        if self.roi_type == DataDim.Data2D:
+            child['children'] = ROIScalableGroup.make_ROIParam2D(descriptor, index)
+        elif self.roi_type == DataDim.Data1D:
+            child['children'] = ROIScalableGroup.make_ROIParam1D(descriptor, index)
         return child  
     
     @staticmethod
-    def makeChannelsParam(dim='2D'):
-        if dim =='2D':
+    def makeChannelsParam(dim=DataDim.Data2D):
+        if dim == DataDim.Data2D:
             child = [{'title': 'Use channel', 'name': 'use_channel', 'type': 'itemselect', 'checkbox': True,
                       'value': dict(all_items=['red', 'green', 'blue'],
                            selected=['red',]),
@@ -88,17 +90,18 @@ class ROIScalableGroup(GroupParameter):
              {'name': 'zlevel', 'title':'Z-level','type': 'int', 'expanded': False, 'value':10},] 
         
     @staticmethod
-    def makeMathParam(dim='2D'):
+    def makeMathParam(dim=DataDim.Data2D):
         return [{'title': 'Math type:', 'name': 'math_function', 'type': 'list',
-                             'limits': data_processors.functions_filtered(f'Data{dim}')},]
+                             'limits': data_processors.functions_filtered(dim)},]
     @staticmethod    
-    def make_ROIParam2D(roi_type, index):
+    def make_ROIParam2D(descriptor: str, index):
             children = []    
-            children.extend([{'title': 'Type', 'name': 'roi_type', 'type': 'list', 'value': roi_type, 'limits':['RectROI','EllipseROI','CircularROI'], 'readonly': False,}])
+            children.extend([{'title': 'Type', 'name': 'roi_type', 'type': 'list', 'value': descriptor,
+                              'limits': ROI2D_TYPES, 'readonly': False,}])
             children.append({'title': 'Process data', 'name': 'process_data', 'type': 'led_push',
                              'value': config.get(('plotting', 'process_roi'), True),})
-            children.extend(ROIScalableGroup.makeChannelsParam('2D'))
-            children.extend(ROIScalableGroup.makeMathParam('2D'))
+            children.extend(ROIScalableGroup.makeChannelsParam(DataDim.Data2D))
+            children.extend(ROIScalableGroup.makeMathParam(DataDim.Data2D))
             children.extend(ROIScalableGroup.makeDisplayParam(index))
             children.extend([{'name': 'center', 'type': 'group', 'expanded': False, 'children': [
                     {'name': 'x', 'type': 'float', 'value': 0, 'step': 1,'decimals':6},
@@ -117,12 +120,12 @@ class ROIScalableGroup(GroupParameter):
             return children
 
     @staticmethod    
-    def make_ROIParam1D(roi_type, index):
+    def make_ROIParam1D(descriptor: str, index):
             children = []
             children.append({'title': 'Process data', 'name': 'process_data', 'type': 'led_push',
                              'value': config.get(('plotting', 'process_roi'), True),})
-            children.extend(ROIScalableGroup.makeChannelsParam('1D'))
-            children.extend(ROIScalableGroup.makeMathParam('1D'))
+            children.extend(ROIScalableGroup.makeChannelsParam(DataDim.Data1D))
+            children.extend(ROIScalableGroup.makeMathParam(DataDim.Data1D))
             children.extend(ROIScalableGroup.makeDisplayParam(index))
             children.extend([{'name': 'position', 'type': 'group', 'children': [
                 {'name': 'left', 'type': 'float', 'value': 0, 'step': 1},
@@ -143,7 +146,7 @@ class ROIManager(QObject):
     roi_changed = Signal()
     color_list = np.array(plot_colors)
 
-    def __init__(self, viewer_widget=None, ROI_type='1D'):
+    def __init__(self, viewer_widget=None, ROI_type=DataDim.Data1D):
         super().__init__()
         self.ROI_type = ROI_type
         self.roiwidget = QtWidgets.QWidget()
@@ -178,8 +181,8 @@ class ROIManager(QObject):
     def emit_colors(self):
         self.color_signal.emit([self._ROIs[roi_key].color for roi_key in self._ROIs])
 
-    def add_roi_programmatically(self, roitype=ROI2D_TYPES[0]):
-        self.settings.child('ROIs').addNew(roitype)
+    def add_roi_programmatically(self, descriptor: str = ROI2D_TYPES[0]):
+        self.settings.child('ROIs').addNew(descriptor)
 
     def remove_roi_programmatically(self, index: int):
         self.settings.child('ROIs').removeChild(self.settings.child('ROIs', roi_format(index)))
@@ -255,19 +258,19 @@ class ROIManager(QObject):
     def make_ROI(self, param: Parameter):
         newindex = int(param.name()[-2:])
         pos = self.viewer_widget.plotItem.vb.viewRange()
-        if self.ROI_type == '1D':
-            roi_type = ''
+        if self.ROI_type == DataDim.Data1D:
+            descriptor = ''
             pos = pos[0]
             pos = pos[0] + np.diff(pos)*np.array([2,4])/6
             roi = self.make_ROI1D(newindex, pos, brush=param['Color'],
                                   compute=param['process_data'])
-        elif self.ROI_type == '2D':
-            roi_type = param.child('roi_type').value()
+        elif self.ROI_type == DataDim.Data2D:
+            descriptor = param.child('roi_type').value()
             xrange,yrange=pos                    
             width = np.max(((xrange[1] - xrange[0]) / 10, 2))
             height = np.max(((yrange[1] - yrange[0]) / 10, 2))
             pos = [int(np.mean(xrange) - width / 2), int(np.mean(yrange) - width / 2)]
-            roi = self.make_ROI2D(roi_type, index=newindex, pos=pos,size=[width, height],
+            roi = self.make_ROI2D(descriptor, index=newindex, pos=pos,size=[width, height],
                                   pen=param['Color'], compute=param['process_data'])
 
         return roi
@@ -305,16 +308,18 @@ class ROIManager(QObject):
         Returns:
             roi: LinearROI
         """
-        roi = LinearROI(index=index, pos=pos, compute=compute, **kwargs)
+        roi = ROIFactory.create(DataDim.Data1D,
+                                ROIFactory.get_descriptors_from_dimensionality(DataDim.Data1D)[0],
+                                index=index, pos=pos, compute=compute, **kwargs)
         # roi.setZValue(-10)
         roi.setOpacity(0.2)
         return roi                    
 
-    def make_ROI2D(self, roi_type, index, pos, size, compute=True, **kwargs):
+    def make_ROI2D(self, descriptor: str, index, pos, size, compute=True, **kwargs):
         """Convenience function to make custom ROI_2D
 
         Args:
-            roi_type (str): Type of 2D ROI
+            descriptor (str): name of 2D ROI
             index (int): Current index of ROI
             pos: Initial position of ROI
             size: Initial size of ROI
@@ -322,20 +327,11 @@ class ROIManager(QObject):
         Returns:
             roi: pg.ROI 
         """
-        if roi_type == 'RectROI':
-            roi = RectROI(index=index, pos=pos,
-                          size=size, name=roi_format(index),
-                          compute=compute, **kwargs)
-        elif roi_type == 'EllipseROI':
-            roi = EllipseROI(index=index, pos=pos,
-                             size=size, name=roi_format(index),
-                             compute=compute, **kwargs)
-        elif roi_type == 'CircularROI':
-            roi = CircularROI(index=index, pos=pos,
-                              size=size, name=roi_format(index),
-                              compute=compute, **kwargs)
 
-        return roi
+        return ROIFactory.create(DataDim.Data2D, descriptor,
+                                 index=index, pos=pos,
+                                 size=size, name=roi_format(index),
+                                 compute=compute, **kwargs)
     
     def remove_ROI(self, roi):
         """Function to remove roi from dict and widget
@@ -654,7 +650,7 @@ if __name__ == '__main__':
 
     im = ImageWidget()
     im = PlotWidget()
-    prog = ROIManager(im, '2D')
+    prog = ROIManager(im, DataDim.Data2D)
     widget = QtWidgets.QWidget()
     layout = QtWidgets.QHBoxLayout()
     widget.setLayout(layout)
