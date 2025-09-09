@@ -4,7 +4,10 @@ import numpy as np
 from qtpy.QtCore import QLocale, Qt, QModelIndex
 from pymodaq_utils import utils
 from pymodaq_gui.qvariant import QVariant
+from pymodaq_data import Q_
 from qtpy import QtWidgets, QtCore
+
+from pyqtgraph.widgets.SpinBox import SpinBox
 
 
 class TableView(QtWidgets.QTableView):
@@ -198,29 +201,51 @@ class TableModel(QtCore.QAbstractTableModel):
         return True
 
 
-class BooleanDelegate(QtWidgets.QItemEditorFactory):
+class BooleanDelegate(QtWidgets.QStyledItemDelegate):
     """
     TO implement custom widget editor for cells in a tableview
     """
-    def createEditor(self, userType, parent):
+    def createEditor(self, parent, option, index):
         boolean = QtWidgets.QCheckBox(parent)
         return boolean
 
+    def setEditorData(self, editor: QtWidgets.QCheckBox, index):
+        editor.setChecked(bool(index.data()))
 
-class SpinBoxDelegate(QtWidgets.QItemEditorFactory):
-    def __init__(self, decimals=4, min=-1e6, max=1e6):
+    def setModelData(self, editor: QtWidgets.QCheckBox, model, index):
+        model.setData(index,
+                      editor.isChecked(),
+                      QtCore.Qt.EditRole)
+
+
+class SpinBoxDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, decimals=4, min=-1e6, max=1e6, units=None):
         self.decimals = decimals
         self.min = min
         self.max = max
+        self.units = units
         super().__init__()
 
-    def createEditor(self, userType, parent):
-        doubleSpinBox = QtWidgets.QDoubleSpinBox(parent)
+    def createEditor(self, parent, option, index):
+        doubleSpinBox = SpinBox(parent)
         doubleSpinBox.setDecimals(self.decimals)
         doubleSpinBox.setMaximum(self.min)
         doubleSpinBox.setMaximum(self.max)
+        if self.units is not None:
+            doubleSpinBox.setOpts(suffix=self.units)
         return doubleSpinBox
 
+    def setEditorData(self, editor: SpinBox, index):
+        editor.setValue(Q_(index.data()).magnitude)
+        editor.setOpts(suffix=Q_(index.data().units))
+
+    def setModelData(self, editor: SpinBox, model, index):
+        model.setData(index,
+                      f"{editor.value()} {editor.opts['suffix']}" if self.units is not None else editor.value(),
+                      QtCore.Qt.EditRole)
+        # model.setData(index,
+        #               editor.value(),
+        #               QtCore.Qt.EditRole)
 
 class MyStyle(QtWidgets.QProxyStyle):
 
@@ -245,11 +270,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication([])
     w = QtWidgets.QMainWindow()
     table = TableView(w)
-    styledItemDelegate = QtWidgets.QStyledItemDelegate()
-    # styledItemDelegate.setItemEditorFactory(SpinBoxDelegate())
-    styledItemDelegate.setItemEditorFactory(BooleanDelegate())
-    #table.setItemDelegate(styledItemDelegate)
-
+    table.setItemDelegate(BooleanDelegate())
     table.setModel(TableModel([[name, True, False, 1.2] for name in ['X_axis', 'Y_axis', 'theta_axis']],
                               header=['Actuator', 'Start', 'Stop', 'Step'],
                               editable=[False, True, True, True]))

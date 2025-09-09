@@ -123,8 +123,7 @@ class TableViewParameterItem(WidgetParameterItem):
         ParameterItem.optsChanged(self, param, opts)
 
         if 'delegate' in opts:
-            styledItemDelegate = QtWidgets.QStyledItemDelegate()
-            styledItemDelegate.setItemEditorFactory(opts['delegate']())
+            styledItemDelegate = opts['delegate']()
             self.widget.setItemDelegate(styledItemDelegate)
 
         if 'menu' in opts:
