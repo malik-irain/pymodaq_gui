@@ -64,9 +64,7 @@ class ViewerPointList(QObject):
         self.table_view.horizontalHeader().setStretchLastSection(True)
         self.table_view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.table_view.setSelectionMode(QtWidgets.QTableView.SingleSelection)
-        styledItemDelegate = QtWidgets.QStyledItemDelegate()
-        styledItemDelegate.setItemEditorFactory(SpinBoxDelegate())
-        self.table_view.setItemDelegate(styledItemDelegate)
+        self.table_view.setItemDelegate(SpinBoxDelegate())
 
         self.table_view.setDragEnabled(True)
         self.table_view.setDropIndicatorShown(True)
