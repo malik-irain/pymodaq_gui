@@ -46,7 +46,7 @@ def set_dark_palette(app):
     palette.setColor(QPalette.ColorRole.BrightText, Qt.GlobalColor.red)
     palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
     palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
-    palette.setColor(QPalette.ColorRole.HighlightedText, QColor(127,127,127))
+    palette.setColor(QPalette.ColorRole.HighlightedText, QColor(250,250,250))
     palette.setColor(QPalette.Disabled, QPalette.ColorRole.ButtonText, Qt.GlobalColor.darkGray)
     palette.setColor(QPalette.Disabled, QPalette.ColorRole.WindowText, Qt.GlobalColor.darkGray)
     palette.setColor(QPalette.Disabled, QPalette.ColorRole.Text, Qt.GlobalColor.darkGray)
