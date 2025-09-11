@@ -17,7 +17,7 @@ from pymodaq_utils.logger import set_logger, get_module_name
 from pymodaq_data.data import (Axis, DataToExport, DataFromRoi, DataRaw,
                                DataDistribution, DataWithAxes)
 
-from pymodaq_gui.managers.roi_manager import ROIManager
+from pymodaq_gui.managers.roi_manager import ROIManager, DataDim
 from pymodaq_gui.plotting.items.roi import SimpleRectROI
 
 from pymodaq_gui.managers.action_manager import ActionManager
@@ -326,7 +326,7 @@ class View2D(ActionManager, QtCore.QObject):
             self.parent_widget.show()
 
         self.image_widget = ImageWidget()
-        self.roi_manager = ROIManager(self.image_widget, '2D')
+        self.roi_manager = ROIManager(self.image_widget, DataDim.Data2D)
 
         self.roi_target: Union[pgROI, Crosshair] = None
 

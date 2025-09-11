@@ -1,10 +1,11 @@
 from abc import abstractmethod
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union, Callable
 
 import numpy as np
 import pyqtgraph as pg
 from pymodaq_data.post_treatment.process_to_scalar import DataProcessorFactory
 from pymodaq_utils.logger import get_module_name, set_logger
+from pymodaq_utils.enums import StrEnum
 from pymodaq_utils.math_utils import rotate2D
 from pymodaq_utils.utils import plot_colors
 from pyqtgraph import ROI as pgROI
@@ -27,6 +28,76 @@ translate = QtCore.QCoreApplication.translate
 ROI_NAME_PREFIX = 'ROI_'
 def roi_format(index):
     return f'{ROI_NAME_PREFIX}{index:02d}'
+
+
+class DataDim(StrEnum):
+    Data1D = 'Data1D'
+    Data2D = 'Data2D'
+
+
+class ROIBase:
+    """ Base class to be inherited for ROI to be created by the factory"""
+    DIMENSIONALITY: DataDim = NotImplemented
+    DESCRIPTOR: str = NotImplemented  # the identifier of the ROI, its name!
+
+
+class ROIFactory():
+    """The factory class for creating ROI"""
+
+    registry = {}
+
+    @classmethod
+    def register(cls) -> Callable:
+        """Class decorator method to register ROI class to the internal registry. Must be used as
+        decorator above the definition of a ROI class.
+        """
+
+        def inner_wrapper(wrapped_class: ROIBase) -> ROIBase:
+            if wrapped_class.DIMENSIONALITY   is NotImplemented or \
+                    wrapped_class.DESCRIPTOR is NotImplemented:
+                raise NotImplementedError(f'{wrapped_class} does not properly provide a valid value for '
+                                          f'`DIMENSIONALITY` ({wrapped_class.DIMENSIONALITY}) or for '
+                                          f'`ROI_DESC` ({wrapped_class.DESCRIPTOR})')
+
+            if wrapped_class.DIMENSIONALITY not in cls.registry:
+                cls.registry[wrapped_class.DIMENSIONALITY] = {}
+            if wrapped_class.DESCRIPTOR not in cls.registry[wrapped_class.DIMENSIONALITY]:
+                cls.registry[wrapped_class.DIMENSIONALITY][wrapped_class.DESCRIPTOR] = wrapped_class
+            return wrapped_class
+        return inner_wrapper
+
+    @classmethod
+    def create(cls, dimensionality: DataDim, descriptor: str, *args, **kwargs) -> ROIBase:
+        """Factory command to create the ROI object.
+        This method gets the appropriate ROI class from the registry and instantiates it.
+        Parameters
+        ----------
+        dimensionality: DataDim
+            the dimensionality of the ROI
+        descriptor: str
+            the roi descriptor string
+        Returns
+        -------
+        an instance of the ROI created
+        """
+        if dimensionality not in cls.registry:
+            raise ValueError(f".{dimensionality} is not a supported ROI dimensionality")
+        elif descriptor not in cls.registry[dimensionality]:
+            raise ValueError(f".{descriptor} is not a supported file description.")
+
+        return cls.registry[dimensionality][descriptor](*args, **kwargs)
+
+    @classmethod
+    def get_dimensionality(cls):
+        """Returns a list of registered dimensionality"""
+        return list(cls.registry.keys()).sort()
+
+    @classmethod
+    def get_descriptors_from_dimensionality(cls, dim: DataDim):
+        """Returns a list of ROi descriptors for a given dimensionality"""
+        descriptors = list(cls.registry[dim].keys())
+        descriptors.sort()
+        return descriptors
 
 
 class ROIMixin(QtCore.QObject):
@@ -102,7 +173,8 @@ class ROIMixin(QtCore.QObject):
         self._compute = compute
 
 
-class ROI(pgROI, ROIMixin):
+class ROI(pgROI, ROIMixin, ROIBase):
+    """ Base class for all 2D ROI"""
     sigCopyRequested = Signal(object)
     sigDoubleClicked = Signal(object, object)
     sigRemoveRequested = Signal(object)
@@ -110,6 +182,7 @@ class ROI(pgROI, ROIMixin):
     def __init__(self, *args, index=0, name='roi', compute=True, **kwargs):
         ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgROI.__init__(self, *args, **kwargs)
+        ROIBase.__init__(self)
 
     def getMenu(self):
         if self.menu is None:
@@ -199,14 +272,19 @@ class ROIBrushable(ROI):
         # p.restore()
 
 
-class LinearROI(pgLinearROI, ROIMixin):
+@ROIFactory.register()
+class LinearROI(pgLinearROI, ROIMixin, ROIBase):
     sigCopyRequested = Signal(object)
     sigDoubleClicked = Signal(object,object)
     sigRemoveRequested = Signal(object)
 
+    DIMENSIONALITY = DataDim.Data1D
+    DESCRIPTOR = 'LinearROI'
+
     def __init__(self, index=0, pos=[0, 10], name = 'roi', compute=True, **kwargs):
         ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgLinearROI.__init__(self, values=pos, **kwargs)
+        ROIBase.__init__(self)
 
     def getMenu(self):
         if self.menu is None:
@@ -266,6 +344,7 @@ class LinearROI(pgLinearROI, ROIMixin):
         return self.brush.color()
 
 
+@ROIFactory.register()
 class EllipseROI(ROI):
     """
     Elliptical ROI subclass with one scale handle and one rotation handle.
@@ -279,6 +358,9 @@ class EllipseROI(ROI):
     ============== =============================================================
 
     """
+
+    DIMENSIONALITY = DataDim.Data2D
+    DESCRIPTOR = 'EllipseROI'
 
     def __init__(self, index=0, pos=[0, 0], size=[10, 10], **kwargs):
         # QtGui.QGraphicsRectItem.__init__(self, 0, 0, size[0], size[1])
@@ -331,7 +413,12 @@ class EllipseROI(ROI):
         return self.path
 
 
+@ROIFactory.register()
 class CircularROI(EllipseROI):
+
+    DIMENSIONALITY = DataDim.Data2D
+    DESCRIPTOR = 'CircularROI'
+
     def __init__(self, index=0, pos=[0, 0], size=[10, 10], **kwargs):
         ROI.__init__(self, pos=pos, size=size, index=index, **kwargs)
         self.addScaleHandle([0.5 * 2. ** -0.5 + 0.5, 0.5 * 2. ** -0.5 + 0.5], [0.5, 0.5],
@@ -356,7 +443,12 @@ class SimpleRectROI(ROI):
             self.addScaleHandle([0.5, 1], [0.5, center[1]])
 
 
+@ROIFactory.register()
 class RectROI(ROI):
+
+    DIMENSIONALITY = DataDim.Data2D
+    DESCRIPTOR = 'RectROI'
+
     def __init__(self, index=0, pos=[0, 0], size=[10, 10], **kwargs):
         super().__init__(pos=pos, size=size, index=index, **kwargs)  # , scaleSnap=True, translateSnap=True)
         self.addScaleHandle([1, 1], [0, 0])

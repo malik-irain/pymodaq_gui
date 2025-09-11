@@ -17,7 +17,7 @@ from pymodaq_utils import utils
 from pymodaq_gui.managers.action_manager import ActionManager
 from pymodaq_gui.plotting.data_viewers.viewer import ViewerBase
 from pymodaq_gui.plotting.utils.plot_utils import make_dashed_pens, RoiInfo
-from pymodaq_gui.managers.roi_manager import ROIManager, LinearROI
+from pymodaq_gui.managers.roi_manager import ROIManager, LinearROI, DataDim
 from pymodaq_gui.plotting.utils.filter import Filter1DFromCrosshair, Filter1DFromRois
 from pymodaq_gui.plotting.widgets import PlotWidget
 from pymodaq_gui.plotting.data_viewers.viewer0D import Viewer0D
@@ -279,7 +279,7 @@ class View1D(ActionManager, QObject):
             self.parent_widget.show()
 
         self.plot_widget = PlotWidget()
-        self.roi_manager = ROIManager('1D')
+        self.roi_manager = ROIManager(DataDim.Data1D)
         self.data_displayer = DataDisplayer(self.plotitem, flip_axes=self.flip_axes)
         self.other_data_displayers: Dict[str, DataDisplayer] = {}
         self.setup_widgets()
