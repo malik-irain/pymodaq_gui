@@ -241,6 +241,8 @@ class ItemSelectParameterItem(WidgetParameterItem):
         self.widget.remove_pb.setVisible(opts.get('show_mb', False))
         if 'height' in opts:
             self.widget.itemselect.setMaximumHeight(opts['height'])
+        elif 'enabled' in opts:
+            self.widget.setEnabled(opts['enabled'])
 
     def valueChanged(self, param, val, force=False):
         super().valueChanged(param, val, force)
