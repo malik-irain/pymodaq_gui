@@ -64,15 +64,18 @@ class TreeFromToml(QObject):
                 config[child.name()] = cls.param_to_dict(child)
             else:
                 if child.opts['type'] == 'datetime':
-                    config[child.name()] = datetime.fromtimestamp(
+                    config[child.name()] = datetime.datetime.fromtimestamp(
                         child.value().toSecsSinceEpoch())  # convert QDateTime to python datetime
                 elif child.opts['type'] == 'date':
                     qdt = QtCore.QDateTime()
                     qdt.setDate(child.value())
-                    pdt = datetime.fromtimestamp(qdt.toSecsSinceEpoch())
+                    pdt = datetime.datetime.fromtimestamp(qdt.toSecsSinceEpoch())
                     config[child.name()] = pdt.date()
                 elif child.opts['type'] == 'list':
-                    config[child.name()] = child.opts['limits']
+                    if child.opts['value'] in child.opts['limits']:
+                        child.opts["limits"].remove(child.opts['value'])
+                        child.opts["limits"].insert(0,child.opts["value"])
+                    config[child.name()] = child.opts["limits"]
                 else:
                     config[child.name()] = child.value()
         return config
@@ -105,6 +108,6 @@ class TreeFromToml(QObject):
                     param['type'] = 'list'
                     param['limits'] = config[key]
                     param['value'] = config[key][0]
-                    param['show_pb'] = True
+                    # param['show_pb'] = True # If True, this allows the user to change the limits in the list from the GUI. No need for now.
                 params.append(param)
         return params
