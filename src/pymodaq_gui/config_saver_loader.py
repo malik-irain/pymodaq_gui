@@ -74,7 +74,7 @@ class ConfigSaverLoader:
                 try:
                     child.setValue(self.config(
                         *path))  # first try to load the config including the actuators name
-                except ConfigError as e:
+                except (ConfigError, TypeError) as e:
                     pass
             else:
                 self.load_config(child)
