@@ -12,7 +12,7 @@ from .itemselect import ItemSelectParameter
 from .filedir import FileDirParameter
 from .text import PlainTextPbParameter
 from .numeric import NumericParameter
-
+from .group import GroupParameter
 from pyqtgraph.parametertree.Parameter import registerParameterType, registerParameterItemType, Parameter
 
 registerParameterType('float', NumericParameter, override=True)
@@ -36,3 +36,6 @@ registerParameterType('table_view', TableViewParameter, override=True)
 registerParameterType('itemselect', ItemSelectParameter, override=True)
 registerParameterType('browsepath', FileDirParameter, override=True)
 registerParameterType('text_pb', PlainTextPbParameter, override=True)
+
+registerParameterType('text_pb', PlainTextPbParameter, override=True)
+registerParameterType('group', GroupParameter, override=True)
