@@ -341,11 +341,12 @@ class H5Browser(QObject, ActionManager):
             logger.exception(str(e))
 
     def save_file(self, filename=None):
-
-        if filename is None:
-            filename = select_file(save=True, ext='txt')
-        if filename != '':
-            self.h5utils.save_file(filename)
+        # When used as a slot, for a triggered signal filename becomes a boolean representing the checked state
+        # (hence the typecheck)
+        if isinstance(filename, str) and filename != '':
+            self.h5utils.save_file_as(filename)
+        else:
+            filename = select_file(save=True, ext=['h5', 'hdf5'])
 
     def quit_fun(self):
         """
