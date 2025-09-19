@@ -1,8 +1,8 @@
 from qtpy import QtWidgets, QtCore
-from pyqtgraph.parametertree.parameterTypes.basetypes import ParameterItem, GroupParameter
+from pyqtgraph.parametertree.parameterTypes.basetypes import ParameterItem, GroupParameter, GroupParameterItem
 
 
-class GroupParameterItem(ParameterItem):
+class GroupParameterItem(GroupParameterItem):
     """
     Group parameters are used mainly as a generic parent item that holds (and groups!) a set
     of child parameters. It also provides a simple mechanism for displaying a button or combo
@@ -49,54 +49,7 @@ class GroupParameterItem(ParameterItem):
         self.addItem.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
         self.addItem.depth = self.depth + 1
         ParameterItem.addChild(self, self.addItem)
-        self.addItem.setSizeHint(0, self.addWidgetBox.sizeHint())        
-        
-    def pointSize(self):
-        return self._initialFontPointSize
-
-    def updateDepth(self, depth):
-        """
-        Change set the item font to bold and increase the font size on outermost groups.
-        """
-        for c in [0, 1]:
-            font = self.font(c)
-            font.setBold(True)
-            if depth == 0:
-                font.setPointSize(self.pointSize() + 1)
-            self.setFont(c, font)
-        self.titleChanged()  # sets the size hint for column 0 which is based on the new font
-
-    def addClicked(self):
-        """Called when "add new" button is clicked
-        The parameter MUST have an 'addNew' method defined.
-        """
-        self.param.addNew()
-
-    def addChanged(self):
-        """Called when "add new" combo is changed
-        The parameter MUST have an 'addNew' method defined.
-        """
-        if self.addWidget.currentIndex() == 0:
-            return
-        typ = self.addWidget.currentText()
-        self.param.addNew(typ)
-        self.addWidget.setCurrentIndex(0)
-
-    def treeWidgetChanged(self):
-        ParameterItem.treeWidgetChanged(self)
-        tw = self.treeWidget()
-        if tw is None:
-            return
-        self.setFirstColumnSpanned(True)
-        if self.addItem is not None:
-            tw.setItemWidget(self.addItem, 0, self.addWidgetBox)
-            self.addItem.setFirstColumnSpanned(True)
-
-    def addChild(self, child):  ## make sure added childs are actually inserted before add btn
-        if self.addItem is not None:
-            ParameterItem.insertChild(self, self.childCount() - 1, child)
-        else:
-            ParameterItem.addChild(self, child)
+        self.addItem.setSizeHint(0, self.addWidgetBox.sizeHint())                
 
     def optsChanged(self, param, opts):
         ParameterItem.optsChanged(self, param, opts)
@@ -113,17 +66,6 @@ class GroupParameterItem(ParameterItem):
 
             if 'tip' in opts:
                 self.addWidget.setToolTip(opts['tip'])
-
-    def updateAddList(self):
-        self.addWidget.blockSignals(True)
-        try:
-            self.addWidget.clear()
-            self.addWidget.addItem(self.param.opts['addText'])
-            for t in self.param.opts['addList']:
-                self.addWidget.addItem(t)
-        finally:
-            self.addWidget.blockSignals(False)
-
 
     def updateAddMenu(self):
         self.addWidget.blockSignals(True)
@@ -166,8 +108,6 @@ class GroupParameterItem(ParameterItem):
         """Add a leaf action to the menu"""
         action = menu.addAction(name)
         action.triggered.connect(lambda checked, data=path: self.addMenuItemSelected(data))
-
-
 
     def addMenuItemSelected(self, path_tuple):
         """Called when a menu item is selected from the nested add menu
