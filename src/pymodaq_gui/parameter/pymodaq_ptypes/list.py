@@ -72,7 +72,7 @@ class ListParameterItem(ListParameterItem):
         w.setValue = self.setValue
         self.widget = w  # # needs to be set before limits are changed
         self.limitsChanged(self.param, self.param.opts['limits'])
-        if len(self.forward) > 0:
+        if len(self.forward) > 0 and self.param.hasValue():
             self.setValue(self.param.value())
         return w
 
