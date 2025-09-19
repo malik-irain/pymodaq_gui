@@ -15,9 +15,12 @@ class ScalableGroup(GroupParameter):
     def __init__(self, **opts):
         super().__init__(**opts)    
 
-    def addNew(self, typ):        
-        self.addChild(dict(name="ScalableParam %d" % (len(self.childs)+1), type='str', value=typ[-1], removable=True, renamable=True))
+    def addNew(self, full_path:tuple):        
+        # Full_path contains all the sub menus
+        value = full_path[-1] # Only showing last values as a string
+        self.addChild(dict(name="ScalableParam %d" % (len(self.childs)+1), type='str', value=value, removable=True, renamable=True))
 
+# Need to register a new type to properly trigger addNew
 registerParameterType('groupedit', ScalableGroup, override=True)
 
 
