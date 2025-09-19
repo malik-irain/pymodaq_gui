@@ -7,16 +7,27 @@ from qtpy import QtWidgets, QtCore
 from collections import OrderedDict
 
 import pymodaq_gui.utils.widgets.table as table
-
+from pymodaq_gui.utils.utils import create_nested_menu
+from pymodaq_gui.parameter.pymodaq_ptypes import GroupParameter, registerParameterType
 from pymodaq_gui.managers.parameter_manager import ParameterManager
+
+class ScalableGroup(GroupParameter):
+    def __init__(self, **opts):
+        super().__init__(**opts)    
+
+    def addNew(self, typ):        
+        self.addChild(dict(name="ScalableParam %d" % (len(self.childs)+1), type='str', value=typ[-1], removable=True, renamable=True))
+
+registerParameterType('groupedit', ScalableGroup, override=True)
 
 
 class ParameterEx(ParameterManager):
     params = [
         {'title': 'Groups:', 'name': 'groups', 'type': 'group', 'children': [
             {'title': 'A visible group:', 'name': 'agroup', 'type': 'group', 'children': []},
-            {'title': 'An hidden group:', 'name': 'bgroup', 'type': 'group', 'children': [], 'visible': False},  # this
-            # visible option is not available in usual pyqtgraph group
+            {'title': 'An hidden group:', 'name': 'bgroup', 'type': 'group', 'children': [], 'visible': False},  # this visible option is not available in usual pyqtgraph group     
+            {'title': 'An expandable group:', 'name': 'cgroup', 'type': 'groupedit', 'addText': 'Add', 'addMenu': 
+              create_nested_menu(3,3,'Menu','Sub',use_index_tracking=True)},             
             {'title': 'A bool with children:', 'name': 'booleans_group', 'type': 'bool', 'value':False, 'tip': 'Any Parameter can have its own children', 'children': [
             {'title': 'A bool in a bool', 'name': 'a_bool_in_a_bool', 'type': 'bool', 'value': True},
             {'title': 'A push with children', 'name': 'aboolpush', 'type': 'bool_push', 'value': True, 'label': 'action','children':[
