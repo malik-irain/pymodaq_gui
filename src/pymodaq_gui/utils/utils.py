@@ -13,6 +13,90 @@ from pyqtgraph import mkQApp as mkQApppg
 config = Config()
 logger = set_logger(get_module_name(__file__))
 
+def create_nested_menu(layers, items_per_layer, pattern="Menu", prefix_pattern="Sub", use_index_tracking=False):
+    """
+    Creates a nested dictionary structure with specified layers and items per layer.
+    
+    Args:
+        layers (int): Number of layers in the nested structure
+        items_per_layer (int or list): Number of items per layer. 
+                                     Can be an integer (same for all layers) 
+                                     or a list (specific count for each layer)
+        pattern (str): Base pattern for naming items (default: "Menu")
+        prefix_pattern (str): Prefix pattern for sub-levels (default: "Sub")
+        use_index_tracking (bool): If True, adds _ijk tracking to names (default: False)
+    
+    Returns:
+        dict: Nested dictionary structure
+    
+    Examples:
+        create_nested_menu(3, 2, use_index_tracking=True) creates:
+        {
+            'Menu_1': {
+                'SubMenu_11': ['SubSubMenu_111', 'SubSubMenu_112'],
+                'SubMenu_12': ['SubSubMenu_121', 'SubSubMenu_122']
+            },
+            'Menu_2': {
+                'SubMenu_21': ['SubSubMenu_211', 'SubSubMenu_212'],
+                'SubMenu_22': ['SubSubMenu_221', 'SubSubMenu_222']
+            }
+        }
+    """
+    
+    if layers <= 0:
+        return {}
+    
+    # Handle items_per_layer as int or list
+    if isinstance(items_per_layer, int):
+        items_counts = [items_per_layer] * layers
+    else:
+        items_counts = list(items_per_layer)
+        # Pad with last value if not enough items specified
+        if len(items_counts) < layers:
+            items_counts.extend([items_counts[-1]] * (layers - len(items_counts)))
+    
+    def build_layer(current_layer, parent_index=""):
+        """Recursively build nested structure"""
+        # Generate layer name based on current layer
+        if current_layer == 1:
+            layer_name = pattern
+        else:
+            if prefix_pattern:
+                layer_name = prefix_pattern * (current_layer - 1) + pattern
+            else:
+                layer_name = pattern
+        
+        if current_layer == layers:
+            # Last layer - return list of items
+            result = []
+            for i in range(items_counts[current_layer-1]):
+                if use_index_tracking:
+                    index_suffix = f"_{parent_index}{i+1}"
+                    item_name = f"{layer_name}{index_suffix}"
+                else:
+                    item_name = f"{layer_name}{i+1}"
+                result.append(item_name)
+            return result
+        
+        # Not last layer - return dictionary
+        result = {}
+        for i in range(items_counts[current_layer-1]):
+            if use_index_tracking:
+                index_suffix = f"_{parent_index}{i+1}"
+                key = f"{layer_name}{index_suffix}"
+                new_parent_index = f"{parent_index}{i+1}"
+            else:
+                key = f"{layer_name}{i+1}"
+                new_parent_index = ""
+            
+            result[key] = build_layer(current_layer + 1, new_parent_index)
+        
+        return result
+    
+    return build_layer(1)
+
+
+
 def first_available_integer(liste):
     i = 0
     while i in liste:
