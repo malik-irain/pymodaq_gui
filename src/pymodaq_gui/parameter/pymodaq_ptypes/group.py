@@ -1,5 +1,5 @@
-from qtpy import QtWidgets, QtCore
-from pyqtgraph.parametertree.parameterTypes.basetypes import ParameterItem, GroupParameter, GroupParameterItem
+from qtpy import QtWidgets
+from pyqtgraph.parametertree.parameterTypes.basetypes import GroupParameter, GroupParameterItem
 
 
 class GroupParameterItem(GroupParameterItem):
@@ -10,62 +10,24 @@ class GroupParameterItem(GroupParameterItem):
     """
 
     def __init__(self, param, depth):
-        ParameterItem.__init__(self, param, depth)
-        self._initialFontPointSize = self.font(0).pointSize()
-        self.updateDepth(depth)
+        super().__init__(param, depth)
 
-        self.addItem = None
-        if 'addText' in param.opts:
-            self.addText(param)
-
-        self.optsChanged(self.param, self.param.opts)
-    
-    def addText(self, param):
-        addText = param.opts['addText']
-        if 'addList' in param.opts:
-            self.addWidget = QtWidgets.QComboBox()
-            self.addWidget.setSizeAdjustPolicy(QtWidgets.QComboBox.SizeAdjustPolicy.AdjustToContents)
-            self.updateAddList()
-            self.addWidget.currentIndexChanged.connect(self.addChanged)
-        elif "addMenu" in param.opts:
-            # Create a QPushButton that will show the menu
-            self.addWidget = QtWidgets.QPushButton(addText)
+        if 'addMenu' in param.opts:
+            # Disconnect signal from previous init
+            self.addWidget.clicked.disconnect(self.addClicked)
             # Create the nested menu
             self.addMenu = QtWidgets.QMenu(self.addWidget)
             self.addWidget.setMenu(self.addMenu)
             # Populate the nested menu structure
-            self.updateAddMenu()                  
-        else:
-            self.addWidget = QtWidgets.QPushButton(addText)
-            self.addWidget.clicked.connect(self.addClicked)
-        w = QtWidgets.QWidget()
-        l = QtWidgets.QHBoxLayout()
-        l.setContentsMargins(0, 0, 0, 0)
-        w.setLayout(l)
-        l.addWidget(self.addWidget)
-        l.addStretch()
-        self.addWidgetBox = w
-        self.addItem = QtWidgets.QTreeWidgetItem([])
-        self.addItem.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
-        self.addItem.depth = self.depth + 1
-        ParameterItem.addChild(self, self.addItem)
-        self.addItem.setSizeHint(0, self.addWidgetBox.sizeHint())                
+            self.updateAddMenu()    
 
+        self.optsChanged(self.param, self.param.opts)
+             
     def optsChanged(self, param, opts):
-        ParameterItem.optsChanged(self, param, opts)
+        super().optsChanged(param, opts)
 
-        if 'addList' in opts:
-            self.updateAddList()
-
-        if 'addMenu' in opts:
+        if 'addMenu' in opts and hasattr(self,'addMenu'):
             self.updateAddMenu()            
-
-        if hasattr(self, 'addWidget'):
-            if 'enabled' in opts:
-                self.addWidget.setEnabled(opts['enabled'])
-
-            if 'tip' in opts:
-                self.addWidget.setToolTip(opts['tip'])
 
     def updateAddMenu(self):
         self.addWidget.blockSignals(True)
