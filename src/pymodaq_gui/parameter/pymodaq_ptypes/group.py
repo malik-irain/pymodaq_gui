@@ -10,6 +10,8 @@ class GroupParameterItem(GroupParameterItem):
     """
 
     def __init__(self, param, depth):
+        if 'addMenu' in param.opts:
+            param.opts.pop('addList')
         super().__init__(param, depth)
 
         if 'addMenu' in param.opts:
