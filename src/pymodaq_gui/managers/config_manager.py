@@ -41,7 +41,6 @@ class ConfigManager(ParameterManager):
         """
         super().__init__(settings_name=self.name)
         self.config_path = config_path
-        self.make_config()
         if msgbox:
             msgBox = QMessageBox()
             msgBox.setText("Overshoot Manager?")
@@ -96,7 +95,10 @@ class ConfigManager(ParameterManager):
         ]
         additional_param = self.make_config()
         self.settings = Parameter.create(
-            title="Preset", name="Preset", type="group", children=param + self.make_config()
+            title="Preset",
+            name="Preset",
+            type="group",
+            children=param + additional_param,
         )
         logger.info("Creating a new remote file")
         self.show_config()
