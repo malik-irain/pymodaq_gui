@@ -74,7 +74,7 @@ class ConfigManager(ParameterManager):
         """
         return []
 
-    def set_new_config(self, file: str = None):
+    def set_new_config(self, file: str = None, show=True):
         """
         Create a new configuration with default parameters.
 
@@ -101,9 +101,8 @@ class ConfigManager(ParameterManager):
             children=param + additional_param,
         )
         logger.info("Creating a new remote file")
-        self.show_config()
-
-        raise NotImplementedError
+        if show:
+            self.show_config()
 
     def set_config_from_file(self, file_path: Path, show=True):
         """
