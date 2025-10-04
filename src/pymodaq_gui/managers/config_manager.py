@@ -146,6 +146,8 @@ class ConfigManager(ParameterManager):
                 in the dialog layout. Defaults to None.
             overwrite (bool, optional): If True, overwrites existing files without
                 prompting. Defaults to False.
+        Returns:
+            bool: True if the file was successfully saved, False otherwise.
         """
         dialog = QDialog()
         vlayout = QtWidgets.QVBoxLayout()
@@ -167,8 +169,9 @@ class ConfigManager(ParameterManager):
 
         res = dialog.exec()
         if res == QDialog.DialogCode.Accepted:
-            self.save_config(overwrite)
-
+            is_saved = self.save_config(overwrite)
+        return is_saved
+    
     def save_config(self, overwrite=False):
         """
         Save the current configuration to an XML file.
@@ -182,13 +185,18 @@ class ConfigManager(ParameterManager):
                 prompting. If False, asks for user confirmation before overwriting.
                 Defaults to False.
 
+        Returns:
+            bool: True if the file was successfully saved, False otherwise.
+
         Note:
             The filename is retrieved from the 'filename' parameter in settings.
             The file is saved with a .xml extension in the config_path directory.
         """
-        filename = self.settings.child("filename").value()
+        filename = self.settings.child("filename").value()       
+        saved = False
         try:
             ioxml.parameter_to_xml_file(self.settings, self.config_path.joinpath(filename), overwrite=overwrite)
+            saved = True
         except FileExistsError as currenterror:
             logger.warning(f"{currenterror} File {filename}.xml exists")
             user_agreed = dialogbox(
@@ -198,6 +206,8 @@ class ConfigManager(ParameterManager):
             if user_agreed:
                 ioxml.parameter_to_xml_file(self.settings, self.config_path.joinpath(filename))
                 logger.warning(f"File {filename}.xml overwriten at user request")
+                saved = True
             else:
                 logger.warning(f"File {filename}.xml wasn't saved at user request")
-            pass
+
+        return saved
