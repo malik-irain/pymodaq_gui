@@ -43,7 +43,7 @@ class ConfigManager(ParameterManager):
         self.config_path = config_path
         if msgbox:
             msgBox = QMessageBox()
-            msgBox.setText("Overshoot Manager?")
+            msgBox.setText(f"{self.title} Manager")
             msgBox.setInformativeText("What do you want to do?")
             cancel_button = msgBox.addButton(QMessageBox.StandardButton.Cancel)
             new_button = msgBox.addButton("New", QMessageBox.ButtonRole.ActionRole)
