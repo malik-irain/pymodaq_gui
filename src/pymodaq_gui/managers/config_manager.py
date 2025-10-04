@@ -168,8 +168,7 @@ class ConfigManager(ParameterManager):
 
         res = dialog.exec()
         if res == QDialog.DialogCode.Accepted:
-            is_saved = self.save_config(overwrite)
-        return is_saved
+            return self.save_config(overwrite)
     
     def save_config(self, overwrite=False):
         """
