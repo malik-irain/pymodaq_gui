@@ -93,12 +93,12 @@ class ConfigManager(ParameterManager):
         param = [
             {"title": "Filename:", "name": "filename", "type": "str", "value": file},
         ]
-        additional_param = self.make_config()
+        additional_params = self.make_config()
         self.settings = Parameter.create(
-            title="Preset",
-            name="Preset",
+            title=f"{self.title}",
+            name=f"{self.name}",
             type="group",
-            children=param + additional_param,
+            children=param + additional_params,
         )
         logger.info("Creating a new remote file")
         if show:
@@ -128,7 +128,12 @@ class ConfigManager(ParameterManager):
             logger.exception("file_path must be of xml type")
             return
 
-        self.settings = Parameter.create(title=self.title, name=self.name, type="group", children=children)
+        self.settings = Parameter.create(
+            title=f"{self.title}",
+            name=f"{self.name}",
+            type="group",
+            children=children,
+        )
         if show:
             self.show_config()
 
