@@ -108,7 +108,7 @@ class DataDisplayer(QObject):
             for ind in range(len(data)):
                 self._plot_items.append(pyqtgraph.PlotDataItem(pen=self.colors[ind]))
                 self._plotitem.addItem(self._plot_items[-1])
-                self.legend.addItem(self._plot_items[-1], data.labels[ind])
+                self.legend.addItem(self._plot_items[-1], f"{data.labels[ind]} ({data.units})")
                 max_line = pyqtgraph.InfiniteLine(angle=0,
                                                   pen=pyqtgraph.mkPen(color=self.colors[ind]['color'],
                                                                       style=Qt.DashLine))
@@ -287,7 +287,7 @@ def main():
     prog.get_action('show_data_as_list').trigger()
     for ind, data in enumerate(y1):
         prog.show_data(data_mod.DataRaw('mydata', data=[np.array([data]), np.array([y2[ind]])],
-                                        labels=['lab1', 'lab2']))
+                                        labels=['lab1', 'lab2'], units="V"))
         QtWidgets.QApplication.processEvents()
 
     sys.exit(app.exec_())
