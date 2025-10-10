@@ -3,9 +3,7 @@ from pathlib import Path
 from typing import List, Union, Dict, Optional, Tuple, Any
 
 from qtpy import QtWidgets, QtCore, QtGui
-from pymodaq_gui.parameter.utils import filter_parameter_tree
 from pymodaq_gui.utils.widgets.collapsible_widget import CollapsibleWidget
-from pymodaq_gui.utils.widgets.search_lineedit import SearchLineEdit
 from pymodaq_gui.managers.action_manager import ActionManager
 from pymodaq_gui.parameter import Parameter, ParameterTree, ioxml, utils
 from pymodaq_gui.utils.file_io import select_file
