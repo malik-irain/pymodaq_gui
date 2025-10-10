@@ -2,7 +2,10 @@ import numbers
 from pathlib import Path
 from typing import List, Union, Dict, Optional, Tuple, Any
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
+from pymodaq_gui.parameter.utils import filter_parameter_tree
+from pymodaq_gui.utils.widgets.collapsible_widget import CollapsibleWidget
+from pymodaq_gui.utils.widgets.search_lineedit import SearchLineEdit
 from pymodaq_gui.managers.action_manager import ActionManager
 from pymodaq_gui.parameter import Parameter, ParameterTree, ioxml, utils
 from pymodaq_gui.utils.file_io import select_file
@@ -31,18 +34,18 @@ class ParameterTreeWidget(ActionManager):
 
         #self.tree.setMinimumWidth(150)
         #self.tree.setMinimumHeight(300)
-        
+        toggle_top = QtWidgets.QPushButton("▼")
+        self.collapsible_widget = CollapsibleWidget(
+            toggle_widget=toggle_top,
+            collapsible_widget=self.toolbar,
+            direction="top",
+            content_before_toggle=False,
+        )
+
         # Making the buttons
         self.setup_actions(action_list) 
-        # Making the splitter
-        self.splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
-        # Adding the toolbar + the parameter tree
-        self.splitter.addWidget(toolbar)
-        self.splitter.addWidget(self.tree)
-        # Hiding toolbar
-        self.splitter.setSizes([0, 300])
-        # Adding splitter to layout
-        self.widget.layout().addWidget(self.splitter)
+        self.widget.layout().addWidget(self.collapsible_widget)
+        self.widget.layout().addWidget(self.tree)        
         self.widget.layout().setContentsMargins(0, 0, 0, 0)
 
     def setup_actions(self, action_list: tuple = ('save', 'update', 'load')):
