@@ -11,6 +11,19 @@ from qtpy.QtWidgets import (
 from qtpy.QtCore import Qt, QPropertyAnimation, QEasingCurve, Signal
 import sys
 
+symbol_pairs = [
+    ("▲", "▼"),
+    ("◀", "▶"),
+    ("◄", "►"),
+    ("↑", "↓"),
+    ("→", "←"),
+    ("⬆", "⬇"),
+    ("⬅", "➡"),
+]
+symbol_map = {}
+for sym1, sym2 in symbol_pairs:
+    symbol_map[sym1] = sym2
+    symbol_map[sym2] = sym1
 
 class CollapsibleWidget(QWidget):
 
@@ -139,43 +152,13 @@ class CollapsibleWidget(QWidget):
         if not isinstance(self.toggle_widget, QPushButton) or not self.original_text:
             return
 
-        text = self.original_text
-
-        # Symbol mappings for flipping
-        symbol_map = {
-            "▲": "▼",
-            "▼": "▲",
-            "◀": "▶",
-            "▶": "◀",
-            "◄": "►",
-            "►": "◄",
-            "←": "→",
-            "→": "←",
-            "↑": "↓",
-            "↓": "↑",
-            "⬆": "⬇",
-            "⬇": "⬆",
-            "⬅": "➡",
-            "➡": "⬅",
-        }
-
-        # Create reverse mapping
-        reverse_map = {v: k for k, v in symbol_map.items()}
-        symbol_map.update(reverse_map)
-
-        # Replace symbols in the text
-        new_text = text
-        for original, flipped in symbol_map.items():
-            if expanded:
-                new_text = new_text.replace(original, flipped)
-            else:
-                # When collapsing, we want to go back to original
-                # So we need to check if current text has the flipped symbol
-                current_text = self.toggle_widget.text()
-                if flipped in current_text:
-                    new_text = current_text.replace(flipped, original)
-
-        self.toggle_widget.setText(new_text)
+        text = self.original_text if not expanded else self.toggle_widget.text()
+        
+        for symbol, flipped in symbol_map.items():
+            if symbol in text:
+                new_text = text.replace(symbol, flipped)
+                self.toggle_widget.setText(new_text)
+                break
 
     def set_expanded(self, expanded):
         """Programmatically set the expanded state without animation"""
