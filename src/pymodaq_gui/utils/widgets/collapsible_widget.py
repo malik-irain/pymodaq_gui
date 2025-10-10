@@ -151,15 +151,9 @@ class CollapsibleWidget(QWidget):
         """Update the toggle button symbol based on expanded state"""
         if not isinstance(self.toggle_widget, QPushButton) or not self.original_text:
             return
-
-        text = self.original_text if not expanded else self.toggle_widget.text()
+        text = self.original_text if not expanded else symbol_map[self.original_text]        
+        self.toggle_widget.setText(text)
         
-        for symbol, flipped in symbol_map.items():
-            if symbol in text:
-                new_text = text.replace(symbol, flipped)
-                self.toggle_widget.setText(new_text)
-                break
-
     def set_expanded(self, expanded):
         """Programmatically set the expanded state without animation"""
         if expanded and not self.is_expanded:
