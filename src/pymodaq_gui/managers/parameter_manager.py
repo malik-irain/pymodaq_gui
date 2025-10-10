@@ -47,13 +47,54 @@ class ParameterTreeWidget(ActionManager):
         self.widget.layout().addWidget(self.collapsible_widget)
         self.widget.layout().addWidget(self.tree)        
         self.widget.layout().setContentsMargins(0, 0, 0, 0)
+        # Setup keyboard shortcuts
+        if "search" in action_list:
+            self._setup_search_shortcuts()
 
-    def setup_actions(self, action_list: tuple = ('save', 'update', 'load')):
+    def _setup_search_shortcuts(self):
+        """Setup keyboard shortcuts for search functionality"""
+        self.search_activate_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence("Ctrl+F"), self.widget
+        )
+        self.search_activate_shortcut.activated.connect(self.activate_search)
+
+        self.search_escape_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence("Esc"), self.widget
+        )
+        self.search_escape_shortcut.activated.connect(self.collapse_toolbar)
+
+    def activate_search(self):
+        """Show the collapsible widget and focus on the search field"""
+        # Expand the collapsible widget if it's collapsed
+        self.collapsible_widget.toggle_content()
+        # Get the search widget and set focus
+        search_widget:SearchLineEdit = self.get_action("search_settings")
+        if search_widget:
+            search_widget.setFocus()
+            search_widget.selectAll()  # Optional: select all text for easy replacement
+
+    def collapse_toolbar(self):
+        """Collapse toolbar"""
+        if self.collapsible_widget.is_expanded:
+            self.collapsible_widget.toggle_content()
+            search_widget: SearchLineEdit = self.get_action("search_settings")
+            if search_widget:
+                search_widget.clearFocus()
+
+    def setup_actions(self, action_list: tuple = ('search', 'save', 'update', 'load')):
         """
         See Also
         --------
         ActionManager.add_action
         """
+        # Search action
+        self.add_widget(
+            "search_settings",
+            klass=SearchLineEdit(self.toolbar, debounce_ms=200),
+            visible="search" in action_list,
+        )
+        self.toolbar.addSeparator()
+
         # Saving action
         self.add_action('save_settings', 'Save Settings', 'saveTree',
                         "Save current settings in an xml file", 
@@ -88,8 +129,9 @@ class ParameterManager:
     params = []
 
     def __init__(self, settings_name: Optional[str] = None,
-                 action_list: tuple = ('save', 'update', 'load'),
+                 action_list: tuple = ('search', 'save', 'update', 'load'),
                  ):
+        self._current_filter_text = ""        
         if settings_name is None:
             settings_name = self.settings_name
         # create a settings tree to be shown eventually in a dock
@@ -100,7 +142,16 @@ class ParameterManager:
         self._settings_tree.get_action(f'save_settings').connect_to(self.save_settings_slot)
         self._settings_tree.get_action(f'update_settings').connect_to(self.update_settings_slot)
         self._settings_tree.get_action(f'load_settings').connect_to(self.load_settings_slot)
-                                                                        
+        # Add this line to connect the search widget
+        if "search" in action_list:
+            self._settings_tree.get_action("search_settings").searchTextChanged.connect(
+                self.search_settings_slot
+            )
+        self._settings_tree.collapsible_widget.toggled_signal.connect(
+            self.on_toolbar_toggled
+        )
+
+
         self.settings = Parameter.create(name=settings_name, type='group', children=self.params,
                                          showTop=False)  # create a Parameter
         # object containing the settings defined in the preamble
@@ -241,8 +292,7 @@ class ParameterManager:
             a tuple of some other objects
 
         """
-        pass
-
+        pass      
 
     def save_settings_slot(self, file_path: Path = None):
         """ Method to save the current settings using a xml file extension.
@@ -312,3 +362,24 @@ class ParameterManager:
             else:
                 logger.info(f'The loaded settings from {file_path} do not match the current settings structure and cannot be applied.')
 
+    def _apply_filter(self, text: str):
+        """Apply filter to parameter tree with optimized updates"""
+        with self.settings.treeChangeBlocker():
+            filter_parameter_tree(self.settings, text)
+
+
+    def search_settings_slot(self, text: str = ""):
+        """Handle search text changes"""
+        self._current_filter_text = text
+        self._apply_filter(text)
+
+    def on_toolbar_toggled(self):
+        """Handle toolbar expand/collapse - reapply or clear filter"""
+        search_widget = self._settings_tree.get_action("search_settings")
+
+        if search_widget:
+            if self._settings_tree.collapsible_widget.is_expanded:
+                self._current_filter_text = search_widget.text()
+            else:
+                self._current_filter_text = ""
+            self._apply_filter(self._current_filter_text)
