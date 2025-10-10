@@ -6,7 +6,7 @@ from pymodaq_gui.utils.widgets.collapsible_widget import CollapsibleWidget
 
 @pytest.fixture
 def toggle_button():
-    return QPushButton("▼ Toggle")
+    return QPushButton("▼")
 
 
 @pytest.fixture
