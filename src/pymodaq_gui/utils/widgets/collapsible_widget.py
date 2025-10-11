@@ -261,7 +261,7 @@ if __name__ == "__main__":
     # TOP direction example
     main_layout.addWidget(QLabel("<b>TOP Direction</b>"))
 
-    toggle_top = QPushButton("▲ Expand Top")
+    toggle_top = QPushButton("▲")
     toggle_top.setStyleSheet("""
         QPushButton {
             background-color: #007bff;
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     # BOTTOM direction example
     main_layout.addWidget(QLabel("<b>BOTTOM Direction</b>"))
 
-    toggle_bottom = QPushButton("▼ Expand Bottom")
+    toggle_bottom = QPushButton("▼")
     toggle_bottom.setStyleSheet("""
         QPushButton {
             background-color: #ffc107;
