@@ -63,6 +63,10 @@ class CollapsibleWidget(QWidget):
             self.original_text = self.toggle_widget.text()
 
         self.init_ui()
+        self.connect_signals()
+
+    def connect_signals(self):
+        self.toggled_signal.connect(self._update_toggle_symbol)
 
     def init_ui(self):
         # Wrap collapsible widget in a container for animation
@@ -128,7 +132,6 @@ class CollapsibleWidget(QWidget):
             self.animation.setStartValue(self.content_size)
             self.animation.setEndValue(0)
             self.is_expanded = False
-            self._update_toggle_symbol(False)
         else:
             # Expand animation
             # Update content size in case it changed
@@ -140,7 +143,6 @@ class CollapsibleWidget(QWidget):
             self.animation.setStartValue(0)
             self.animation.setEndValue(self.content_size)
             self.is_expanded = True
-            self._update_toggle_symbol(True)
 
         # Start the animation
         self.animation.start()
