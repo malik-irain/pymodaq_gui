@@ -349,7 +349,7 @@ class Filter2DFromRois(Filter):
                 data_H = data[ind_xaxis]
                 data_V = data[ind_yaxis]
                 int_data = np.array([np.mean(data)])
-
+                sub_data = None
                 _x_axis = dwa.get_axis_from_index_spread(0, 0)
                 x_axis = Axis(_x_axis.label, _x_axis.units, data=xvals, index=0, spread_order=0)
                 _y_axis = dwa.get_axis_from_index_spread(0, 1)
@@ -360,6 +360,9 @@ class Filter2DFromRois(Filter):
             else:
                 slices = self.get_slices_from_roi(roi, dwa.shape)
                 sub_data: DataFromRoi = dwa.isig[slices[0], slices[1]]
+                sub_data.name = 'Croped'
+                sub_data.origin = roi.name
+                sub_data.labels = labels
                 sub_data_hor = sub_data.mean(0)
                 sub_data_ver = sub_data.mean(1)
                 math_data = data_processors.get(math_function).process(sub_data)
@@ -373,6 +376,9 @@ class Filter2DFromRois(Filter):
             math_data.name = 'int'
             math_data.origin = roi.name
             math_data.labels = labels
+
+            if sub_data is not None:
+                dte.append([sub_data])
 
             dte.append([sub_data_hor, sub_data_ver, math_data])
             return dte

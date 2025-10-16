@@ -70,10 +70,10 @@ class TableModel(QtCore.QAbstractTableModel):
     def raw_data(self):
         return copy.deepcopy(self._data)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=None, *args, **kwargs):
         return len(self._data)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=None, *args, **kwargs):
         if self._data != []:
             return len(self._data[0])
         else:
