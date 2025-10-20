@@ -339,7 +339,71 @@ def set_param_from_param(param_old, param_new):
         # except Exception as e:
         #    print(str(e))
 
+def filter_parameter_tree(param:Parameter, search_text:str = "") -> bool:
+    """
+    Filter parameter tree based on search text.
+    Returns True if this parameter or any of its children match the search.
+    """
+    if not search_text:
+        # If search is empty, show everything
+        param.show()
+        for child in param.children():
+            filter_parameter_tree(child, search_text)
+        return True
 
+    search_lower = search_text.lower()
+    param_name_lower = param.title().lower()
+
+    # Check if current parameter matches
+    current_matches = search_lower in param_name_lower
+
+    # If this is a group and it matches, show all children
+    if param.hasChildren() and current_matches:
+        param.setOpts(expanded=True)        
+        param.show()
+        for child in param.children():
+            child.show()
+            # Recursively show all descendants
+            change_visibility_all_descendants(child, visible=True)
+        return True
+
+    # Check if any children match (recursively)
+    # Each child is evaluated independently
+    any_child_matches = False
+    for child in param.children():
+        child_matches = filter_parameter_tree(child, search_text)
+        any_child_matches = any_child_matches or child_matches
+
+    # Show this parameter only if it matches OR any of its children match
+    should_show = current_matches or any_child_matches
+
+    if should_show:
+        param.show()
+        # If children match, expand this parent to show them
+        if any_child_matches and param.hasChildren():
+            items = param.items
+            if items:
+                for item in items:
+                    item.setExpanded(True)
+            param.setOpts(expanded=True)        
+    else:
+        param.hide()
+
+    return should_show
+
+def change_visibility_all_descendants(param: Parameter, visible: bool = True):
+    """Recursively show all descendants of a parameter"""
+    if param.hasChildren():
+        param.setOpts(expanded=True)
+    for child in param.children():
+        if visible:
+            child.show()
+        else:
+            child.hide()
+        change_visibility_all_descendants(child, visible)
+
+
+        
 def scroll_log(scroll_val, min_val, max_val):
     """
     Convert a scroll value [0-100] to a log scale between min_val and max_val

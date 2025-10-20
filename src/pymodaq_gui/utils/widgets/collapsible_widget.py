@@ -11,6 +11,19 @@ from qtpy.QtWidgets import (
 from qtpy.QtCore import Qt, QPropertyAnimation, QEasingCurve, Signal
 import sys
 
+symbol_pairs = [
+    ("▲", "▼"),
+    ("◀", "▶"),
+    ("◄", "►"),
+    ("↑", "↓"),
+    ("→", "←"),
+    ("⬆", "⬇"),
+    ("⬅", "➡"),
+]
+symbol_map = {}
+for sym1, sym2 in symbol_pairs:
+    symbol_map[sym1] = sym2
+    symbol_map[sym2] = sym1
 
 class CollapsibleWidget(QWidget):
 
@@ -50,6 +63,10 @@ class CollapsibleWidget(QWidget):
             self.original_text = self.toggle_widget.text()
 
         self.init_ui()
+        self.connect_signals()
+
+    def connect_signals(self):
+        self.toggled_signal.connect(self._update_toggle_symbol)
 
     def init_ui(self):
         # Wrap collapsible widget in a container for animation
@@ -115,7 +132,6 @@ class CollapsibleWidget(QWidget):
             self.animation.setStartValue(self.content_size)
             self.animation.setEndValue(0)
             self.is_expanded = False
-            self._update_toggle_symbol(False)
         else:
             # Expand animation
             # Update content size in case it changed
@@ -127,7 +143,6 @@ class CollapsibleWidget(QWidget):
             self.animation.setStartValue(0)
             self.animation.setEndValue(self.content_size)
             self.is_expanded = True
-            self._update_toggle_symbol(True)
 
         # Start the animation
         self.animation.start()
@@ -138,45 +153,9 @@ class CollapsibleWidget(QWidget):
         """Update the toggle button symbol based on expanded state"""
         if not isinstance(self.toggle_widget, QPushButton) or not self.original_text:
             return
-
-        text = self.original_text
-
-        # Symbol mappings for flipping
-        symbol_map = {
-            "▲": "▼",
-            "▼": "▲",
-            "◀": "▶",
-            "▶": "◀",
-            "◄": "►",
-            "►": "◄",
-            "←": "→",
-            "→": "←",
-            "↑": "↓",
-            "↓": "↑",
-            "⬆": "⬇",
-            "⬇": "⬆",
-            "⬅": "➡",
-            "➡": "⬅",
-        }
-
-        # Create reverse mapping
-        reverse_map = {v: k for k, v in symbol_map.items()}
-        symbol_map.update(reverse_map)
-
-        # Replace symbols in the text
-        new_text = text
-        for original, flipped in symbol_map.items():
-            if expanded:
-                new_text = new_text.replace(original, flipped)
-            else:
-                # When collapsing, we want to go back to original
-                # So we need to check if current text has the flipped symbol
-                current_text = self.toggle_widget.text()
-                if flipped in current_text:
-                    new_text = current_text.replace(flipped, original)
-
-        self.toggle_widget.setText(new_text)
-
+        text = self.original_text if not expanded else symbol_map[self.original_text]        
+        self.toggle_widget.setText(text)
+        
     def set_expanded(self, expanded):
         """Programmatically set the expanded state without animation"""
         if expanded and not self.is_expanded:
@@ -282,7 +261,7 @@ if __name__ == "__main__":
     # TOP direction example
     main_layout.addWidget(QLabel("<b>TOP Direction</b>"))
 
-    toggle_top = QPushButton("▲ Expand Top")
+    toggle_top = QPushButton("▲")
     toggle_top.setStyleSheet("""
         QPushButton {
             background-color: #007bff;
@@ -309,7 +288,7 @@ if __name__ == "__main__":
     # BOTTOM direction example
     main_layout.addWidget(QLabel("<b>BOTTOM Direction</b>"))
 
-    toggle_bottom = QPushButton("▼ Expand Bottom")
+    toggle_bottom = QPushButton("▼")
     toggle_bottom.setStyleSheet("""
         QPushButton {
             background-color: #ffc107;
