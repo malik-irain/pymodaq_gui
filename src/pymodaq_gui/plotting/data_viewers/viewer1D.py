@@ -173,7 +173,7 @@ class DataDisplayer(QObject):
             axis = self._plotitem.getAxis('bottom')
             axis.setLabel(text=_axis.label, units=_axis.units)
             axis = self._plotitem.getAxis('left')
-            axis.setLabel(text='', units='')
+            axis.setLabel(text='', units=dwa.units)
             self.legend.setVisible(True)
 
     def plot_with_scatter(self, with_scatter=True, symbol_size=5, symbol='o', color=None):
@@ -838,8 +838,8 @@ def main_xy():
     y2 = gauss1D(x, 120, 50, 2)
 
     QtWidgets.QApplication.processEvents()
-    data = DataRaw('mydata', data=[y1, y2],
-                   axes=[Axis('myaxis', 'units', data=x, index=0, spread_order=0)],
+    data = DataRaw('mydata', data=[y1, y2], units='m/s',
+                   axes=[Axis('myaxis', 's', data=x, index=0, spread_order=0)],
                    )
     data.plot('qt')
 
