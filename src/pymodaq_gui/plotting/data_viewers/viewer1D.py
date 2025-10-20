@@ -24,7 +24,7 @@ from pymodaq_gui.plotting.data_viewers.viewer0D import Viewer0D
 
 logger = set_logger(get_module_name(__file__))
 
-PLOT_COLORS = utils.plot_colors
+PLOT_COLORS = utils.PlotColors()
 
 
 class DataDisplayer(QObject):
@@ -180,14 +180,14 @@ class DataDisplayer(QObject):
 
         for ind, plot_item in enumerate(self.get_plot_items()):
             if color is None:
-                color = self._plot_colors[ind]
+                scatter_color = self._plot_colors[ind]
             if with_scatter:
                 pen = None
                 symbol_type = symbol
-                brush = color
+                brush = scatter_color
 
             else:
-                pen = color
+                pen = scatter_color
                 symbol_type = None
                 brush = None
 
