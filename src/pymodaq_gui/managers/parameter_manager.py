@@ -29,7 +29,7 @@ class ParameterTreeWidget(ActionManager):
     action_list : tuple, optional
         Tuple of action names to include in the toolbar. Valid values are:
         'save', 'update', 'load', and 'search'. Default is ('save', 'update', 'load').
-    tree: The class def of the ParameterTree to be used. To allow the use of modified
+    tree_class: The class def of the ParameterTree to be used. To allow the use of modified
         ParameterTree that would allow specific dragdrop for instance)
 
     Attributes
@@ -37,7 +37,7 @@ class ParameterTreeWidget(ActionManager):
     widget : QtWidgets.QWidget
         The main widget containing the toolbar and parameter tree
     tree : ParameterTree
-        A parameter tree for displaying and editing parameters
+        The parameter tree for displaying and editing parameters
     toolbar : QtWidgets.QToolBar
         Toolbar containing action buttons for parameter management
     collapsible_widget : CollapsibleWidget
@@ -45,7 +45,7 @@ class ParameterTreeWidget(ActionManager):
     """
 
     def __init__(self, action_list: tuple = ("save", "update", "load"),
-                 tree = ParameterTree()):
+                 tree_class = ParameterTree):
         super().__init__()
 
         self.widget = QtWidgets.QWidget()
@@ -53,7 +53,7 @@ class ParameterTreeWidget(ActionManager):
 
         toolbar = QtWidgets.QToolBar()
         self.set_toolbar(toolbar)
-        self.tree: ParameterTree = tree
+        self.tree: ParameterTree = tree_class()
 
         self.widget.header = (
             self.tree.header
@@ -189,7 +189,7 @@ class ParameterManager:
         Tuple of action names to include in the toolbar. Valid values are:
         'search', 'save', 'update', and 'load'.
         Default is ('search', 'save', 'update', 'load').
-    tree: ParameterTree
+    tree_class: ParameterTree
         Allow the use of modified ParameterTree (allowing drag/drop for instance)
 
     Attributes
@@ -228,7 +228,7 @@ class ParameterManager:
             self,
             settings_name: Optional[str] = None,
             action_list: tuple = ("search", "save", "update", "load"),
-            tree: ParameterTree = ParameterTree
+            tree_class: type[ParameterTree] = ParameterTree
 
     ):
         self._current_filter_text = ""
@@ -237,7 +237,7 @@ class ParameterManager:
         # create a settings tree to be shown eventually in a dock
         # object containing the settings defined in the preamble
         # create a settings tree to be shown eventually in a dock
-        self._settings_tree = ParameterTreeWidget(action_list, tree)
+        self._settings_tree = ParameterTreeWidget(action_list, tree_class)
 
         self._settings_tree.get_action(f"save_settings").connect_to(
             self.save_settings_slot
