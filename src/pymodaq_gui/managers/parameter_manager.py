@@ -37,7 +37,7 @@ class ParameterTreeWidget(ActionManager):
     widget : QtWidgets.QWidget
         The main widget containing the toolbar and parameter tree
     tree : ParameterTree
-        A parameter tree for displaying and editing parameters
+        A custom parameter tree for displaying and editing parameters
     toolbar : QtWidgets.QToolBar
         Toolbar containing action buttons for parameter management
     collapsible_widget : CollapsibleWidget
@@ -45,7 +45,7 @@ class ParameterTreeWidget(ActionManager):
     """
 
     def __init__(self, action_list: tuple = ("save", "update", "load"),
-                 tree = ParameterTree()):
+                 tree: ParameterTree = None):
         super().__init__()
 
         self.widget = QtWidgets.QWidget()
@@ -53,6 +53,8 @@ class ParameterTreeWidget(ActionManager):
 
         toolbar = QtWidgets.QToolBar()
         self.set_toolbar(toolbar)
+        if tree is None:
+            tree = ParameterTree()
         self.tree: ParameterTree = tree
 
         self.widget.header = (
@@ -228,7 +230,7 @@ class ParameterManager:
             self,
             settings_name: Optional[str] = None,
             action_list: tuple = ("search", "save", "update", "load"),
-            tree: ParameterTree = ParameterTree
+            tree: ParameterTree = None
 
     ):
         self._current_filter_text = ""
