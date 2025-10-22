@@ -84,9 +84,6 @@ class ConfigManager(ParameterManager):
         Args:
             file (str, optional): Default filename for the new config.
                 If None, uses "{title}_default". Defaults to None.
-
-        Raises:
-            NotImplementedError: This method must be fully implemented in subclasses.
         """
         if file is None:
             file = f"{self.title}_default"
