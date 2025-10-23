@@ -115,8 +115,9 @@ def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip=
     return action
 
 
-def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None, visible=True,
-              signal_str=None, slot: Callable=None, setters = {}, **kwargs):
+def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None,
+              visible=True,
+              signal_str=None, slot: Callable=None, setters: dict = None, enabled=True, **kwargs):
     """Create and eventually add a widget to a toolbar
 
     Parameters
@@ -135,6 +136,8 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
         an attribute of type Signal of the widget
     slot: Callable
         a callable connected to the signal
+    enabled: bool
+        enable state of the widget
     kwargs: dict
         variable named arguments used as is in the widget constructor
     setters: dict
@@ -143,6 +146,8 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
     -------
     QtWidgets.QWidget
     """
+    if setters is None:
+        setters = {}
     if isinstance(klass, str):
         if hasattr(QtWidgets, klass):
             widget: QtWidgets.QWidget = getattr(QtWidgets, klass)(*args)
@@ -155,10 +160,16 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
             widget = klass(*args, **kwargs)
         except:
             return None
-    widget.setVisible(visible)
-    widget.setToolTip(tip)
+
     if toolbar is not None:
-        toolbar.addWidget(widget)
+        action: QtWidgets.QAction = toolbar.addWidget(widget)
+        action.setVisible(visible)
+        action.setToolTip(tip)
+        widget.setVisible = action.setVisible #because visibility is only possible on the underlying QAction
+    else:
+        widget.setVisible(visible)
+        widget.setToolTip(tip)
+
     if isinstance(signal_str, str) and slot is not None:
         if hasattr(widget, signal_str):
             getattr(widget, signal_str).connect(slot)
@@ -166,7 +177,7 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
     for setter in setters:
         if hasattr(widget, setter):
             getattr(widget, setter)(setters[setter])
-
+    widget.setEnabled(enabled)
     return widget
 
 
@@ -256,7 +267,7 @@ class ActionManager:
 
     def add_widget(self, short_name, klass: Union[str, QtWidgets.QWidget, object], *args, tip='',
                    toolbar: QtWidgets.QToolBar = None, visible=True, signal_str=None,
-                   slot: Callable=None, **kwargs):
+                   slot: Callable=None, enabled=True, **kwargs):
         """Create and add a widget to a toolbar
 
         Parameters
@@ -277,6 +288,8 @@ class ActionManager:
             an attribute of type Signal of the widget
         slot: Callable
             a callable connected to the signal
+        enabled: bool
+            enable state of the widget
         kwargs: dict
             variable named arguments passed as is to the widget constructor
         Returns
@@ -286,7 +299,7 @@ class ActionManager:
         if toolbar is None:
             toolbar = self._toolbar
         widget = addwidget(klass, *args, tip=tip, toolbar=toolbar, visible=visible, signal_str=signal_str,
-                           slot=slot, **kwargs)
+                           slot=slot, enabled=enabled, **kwargs)
         if widget is not None:
             self._actions[short_name] = widget
         else:
