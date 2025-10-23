@@ -115,7 +115,8 @@ def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip=
     return action
 
 
-def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None, visible=True,
+def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None,
+              visible=True,
               signal_str=None, slot: Callable=None, setters: dict = None, enabled=True, **kwargs):
     """Create and eventually add a widget to a toolbar
 
@@ -159,10 +160,16 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
             widget = klass(*args, **kwargs)
         except:
             return None
-    widget.setVisible(visible)
-    widget.setToolTip(tip)
+
     if toolbar is not None:
-        toolbar.addWidget(widget)
+        action: QtWidgets.QAction = toolbar.addWidget(widget)
+        action.setVisible(visible)
+        action.setToolTip(tip)
+        widget.setVisible = action.setVisible #because visibility is only possible on the underlying QAction
+    else:
+        widget.setVisible(visible)
+        widget.setToolTip(tip)
+
     if isinstance(signal_str, str) and slot is not None:
         if hasattr(widget, signal_str):
             getattr(widget, signal_str).connect(slot)
