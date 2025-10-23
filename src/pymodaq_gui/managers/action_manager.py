@@ -1,5 +1,5 @@
 import warnings
-from typing import Iterable as IterableType
+
 from pymodaq_utils.warnings import deprecation_msg
 from multipledispatch import dispatch
 from typing import Union, Callable, List
@@ -437,8 +437,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType)
-    def is_action_visible(self, actions_name: IterableType):
+    @dispatch(list)
+    def is_action_visible(self, actions_name: list):
         """Check the visibility of a given action or the list of an action"""
         isvisible = False
         for action_name in actions_name:
@@ -454,8 +454,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType)
-    def is_action_checked(self, actions_name: IterableType):
+    @dispatch(list)
+    def is_action_checked(self, actions_name: list):
         """Get the CheckState of a given action or a list of actions"""
         ischecked = False
         for action_name in actions_name:
@@ -471,8 +471,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType, bool)
-    def set_action_visible(self, actions_name: IterableType, visible=True):
+    @dispatch(list, bool)
+    def set_action_visible(self, actions_name: list, visible=True):
         """Set the visibility of a given action or a list of an action"""
         for action_name in actions_name:
             self.set_action_visible(action_name, visible)
@@ -486,8 +486,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType, bool)
-    def set_action_checked(self, actions_name: IterableType, checked=True):
+    @dispatch(list, bool)
+    def set_action_checked(self, actions_name: list, checked=True):
         """Set the CheckedState of a given action or a list of actions"""
         for action_name in actions_name:
             self.set_action_checked(action_name, checked)
@@ -501,8 +501,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType, bool)
-    def set_action_enabled(self, actions_name: IterableType, enabled=True):
+    @dispatch(list, bool)
+    def set_action_enabled(self, actions_name: list, enabled=True):
         """Set the EnabledState of a given action or a list of actions"""
         for action_name in actions_name:
             self.set_action_enabled(action_name, enabled)
@@ -516,8 +516,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(IterableType)
-    def is_action_checked(self, actions_name: IterableType):
+    @dispatch(list)
+    def is_action_checked(self, actions_name: list):
         """Get the EnabledState of a given action or a list of actions"""
         is_enabled = False
         for action_name in actions_name:
