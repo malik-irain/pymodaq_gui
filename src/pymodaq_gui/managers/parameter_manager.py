@@ -716,7 +716,10 @@ class ParameterManager:
         filtering large parameter trees.
         """
         with self.settings.treeChangeBlocker():
-            filter_parameter_tree(self.settings, text)
+            # Filter each child independently to avoid calling show() on the root parameter
+            # This prevents issues with the root parameter name when showTop=False
+            for child in self.settings.children():
+                filter_parameter_tree(child, text)                            
 
     def search_settings_slot(self, text: str = ""):
         """Handle search text changes and filter the parameter tree.
