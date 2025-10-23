@@ -38,7 +38,7 @@ class CustomApp(QObject, ActionManager, ParameterManager):
     log_signal = QtCore.Signal(str)
     params = []
 
-    def __init__(self, parent: Union[DockArea, QtWidgets.QWidget]):
+    def __init__(self, parent: Union[DockArea, QtWidgets.QMainWindow, QtWidgets.QWidget]):
         QObject.__init__(self)
         ActionManager.__init__(self)
         ParameterManager.__init__(self)
@@ -51,6 +51,9 @@ class CustomApp(QObject, ActionManager, ParameterManager):
         if isinstance(parent, DockArea):
             self.dockarea: DockArea = parent
             self.mainwindow: QtWidgets.QMainWindow = parent.parent()
+        elif isinstance(parent, QtWidgets.QMainWindow):
+            self.dockarea: DockArea = None
+            self.mainwindow: QtWidgets.QMainWindow = parent
         else:
             self.dockarea: DockArea = None
             self.mainwindow: QtWidgets.QMainWindow = None
