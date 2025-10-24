@@ -79,8 +79,11 @@ class TableModel(QtCore.QAbstractTableModel):
         else:
             return 0
 
-    def get_data(self, row, col):
-        return self._data[row][col]
+    def get_data(self, row, col=None):
+        if col is None:
+            return self._data[row]
+        else:
+            return self._data[row][col]
 
     def get_data_all(self):
         return self._data
@@ -191,6 +194,11 @@ class TableModel(QtCore.QAbstractTableModel):
         self.endInsertRows()
         return True
 
+    def moveRow(self, sourceParent: QtCore.QModelIndex, sourceRow: int,
+                 destinationParent: QtCore.QModelIndex, destinationChild: int):
+        #todo implement moveRow
+        index = self._data.index(self.data_tmp)
+
     def remove_row(self, row):
         self.removeRows(row, 1, self.index(-1, -1))
 
@@ -217,7 +225,7 @@ class BooleanDelegate(QtWidgets.QStyledItemDelegate):
     def setModelData(self, editor: QtWidgets.QCheckBox, model, index):
         model.setData(index,
                       editor.isChecked(),
-                      QtCore.Qt.EditRole)
+                      QtCore.Qt.ItemDataRole.EditRole)
 
 
 class SpinBoxDelegate(QtWidgets.QStyledItemDelegate):
@@ -244,7 +252,8 @@ class SpinBoxDelegate(QtWidgets.QStyledItemDelegate):
     def setModelData(self, editor: SpinBox, model, index):
         model.setData(index,
                       f"{editor.value()} {editor.opts['suffix']}" if self.units is not None else f"{editor.value()}",
-                      QtCore.Qt.EditRole)
+                      QtCore.Qt.ItemDataRole.EditRole)
+
 
 class MyStyle(QtWidgets.QProxyStyle):
 
