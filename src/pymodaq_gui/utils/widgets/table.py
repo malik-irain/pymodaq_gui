@@ -157,7 +157,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def setData(self, index, value, role):
         if index.isValid():
-            if role == Qt.EditRole:
+            if role == Qt.ItemDataRole.EditRole:
                 if self.validate_data(index.row(), index.column(), self.cast(value)):
                     self._data[index.row()][index.column()] = self.cast(value)
                     self.dataChanged.emit(index, index, [role])
@@ -165,7 +165,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
                 else:
                     return False
-            elif role == Qt.CheckStateRole:
+            elif role == Qt.ItemDataRole.CheckStateRole:
                 self._checked[index.row()] = True if value == Qt.CheckState.Checked else False
                 self.dataChanged.emit(index, index, [role])
                 return True
