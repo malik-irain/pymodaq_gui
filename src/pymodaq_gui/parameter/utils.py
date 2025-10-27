@@ -194,7 +194,7 @@ def compareValuesParameter(param1:Parameter, param2: Parameter,)-> bool:
     return getValues(param1) == getValues(param2)    
 
 
-def iter_children(param, childlist: list = None, filter_type=(), filter_name=(), select_filter=False)-> list:
+def iter_children(param, childlist: list = [], filter_type=(), filter_name=(), select_filter=False)-> list:
 
 
     """
@@ -205,13 +205,11 @@ def iter_children(param, childlist: list = None, filter_type=(), filter_name=(),
     list
         The list of the children name from the given node.       
     """
-    if childlist is None:
-        childlist = []
     return iter_children_params(param, childlist=childlist, output_type='name',
                                 filter_type=(), filter_name=(), select_filter=False)
 
 
-def iter_children_params(param, childlist: list = None, output_type=None,
+def iter_children_params(param, childlist: list = [], output_type=None,
                          filter_type=(), filter_name=(), select_filter=False)-> list:
     """
     Get a list of parameters under a given Parameter.
@@ -237,9 +235,6 @@ def iter_children_params(param, childlist: list = None, output_type=None,
     list
         The list of the children from the given node.    
     """
-    if childlist is None:
-        childlist = []
-
     for child in param.children():
         # XNOR Gate        
         is_filtered = child.type() in filter_type or child.name() in filter_name
