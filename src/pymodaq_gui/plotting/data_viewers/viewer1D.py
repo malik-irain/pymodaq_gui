@@ -24,7 +24,7 @@ from pymodaq_gui.plotting.data_viewers.viewer0D import Viewer0D
 
 logger = set_logger(get_module_name(__file__))
 
-PLOT_COLORS = utils.plot_colors
+PLOT_COLORS = utils.PlotColors()
 
 
 class DataDisplayer(QObject):
@@ -173,21 +173,21 @@ class DataDisplayer(QObject):
             axis = self._plotitem.getAxis('bottom')
             axis.setLabel(text=_axis.label, units=_axis.units)
             axis = self._plotitem.getAxis('left')
-            axis.setLabel(text='', units='')
+            axis.setLabel(text='', units=dwa.units)
             self.legend.setVisible(True)
 
     def plot_with_scatter(self, with_scatter=True, symbol_size=5, symbol='o', color=None):
 
         for ind, plot_item in enumerate(self.get_plot_items()):
             if color is None:
-                color = self._plot_colors[ind]
+                scatter_color = self._plot_colors[ind]
             if with_scatter:
                 pen = None
                 symbol_type = symbol
-                brush = color
+                brush = scatter_color
 
             else:
-                pen = color
+                pen = scatter_color
                 symbol_type = None
                 brush = None
 
@@ -838,8 +838,8 @@ def main_xy():
     y2 = gauss1D(x, 120, 50, 2)
 
     QtWidgets.QApplication.processEvents()
-    data = DataRaw('mydata', data=[y1, y2],
-                   axes=[Axis('myaxis', 'units', data=x, index=0, spread_order=0)],
+    data = DataRaw('mydata', data=[y1, y2], units='m/s',
+                   axes=[Axis('myaxis', 's', data=x, index=0, spread_order=0)],
                    )
     data.plot('qt')
 

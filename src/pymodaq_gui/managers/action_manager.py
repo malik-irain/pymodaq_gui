@@ -1,5 +1,6 @@
 import warnings
-
+from typing import Iterable as IterableType
+from collections.abc import Iterable
 from pymodaq_utils.warnings import deprecation_msg
 from multipledispatch import dispatch
 from typing import Union, Callable, List
@@ -115,8 +116,9 @@ def addaction(name: str = '', icon_name: Union[str, Path, QtGui.QIcon]= '', tip=
     return action
 
 
-def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None, visible=True,
-              signal_str=None, slot: Callable=None, setters = {}, **kwargs):
+def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolbar: QtWidgets.QToolBar = None,
+              visible=True,
+              signal_str=None, slot: Callable=None, setters: dict = None, enabled=True, **kwargs):
     """Create and eventually add a widget to a toolbar
 
     Parameters
@@ -135,6 +137,8 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
         an attribute of type Signal of the widget
     slot: Callable
         a callable connected to the signal
+    enabled: bool
+        enable state of the widget
     kwargs: dict
         variable named arguments used as is in the widget constructor
     setters: dict
@@ -143,6 +147,8 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
     -------
     QtWidgets.QWidget
     """
+    if setters is None:
+        setters = {}
     if isinstance(klass, str):
         if hasattr(QtWidgets, klass):
             widget: QtWidgets.QWidget = getattr(QtWidgets, klass)(*args)
@@ -155,10 +161,16 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
             widget = klass(*args, **kwargs)
         except:
             return None
-    widget.setVisible(visible)
-    widget.setToolTip(tip)
+
     if toolbar is not None:
-        toolbar.addWidget(widget)
+        action: QtWidgets.QAction = toolbar.addWidget(widget)
+        action.setVisible(visible)
+        action.setToolTip(tip)
+        widget.setVisible = action.setVisible #because visibility is only possible on the underlying QAction
+    else:
+        widget.setVisible(visible)
+        widget.setToolTip(tip)
+
     if isinstance(signal_str, str) and slot is not None:
         if hasattr(widget, signal_str):
             getattr(widget, signal_str).connect(slot)
@@ -166,7 +178,7 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
     for setter in setters:
         if hasattr(widget, setter):
             getattr(widget, setter)(setters[setter])
-
+    widget.setEnabled(enabled)
     return widget
 
 
@@ -256,7 +268,7 @@ class ActionManager:
 
     def add_widget(self, short_name, klass: Union[str, QtWidgets.QWidget, object], *args, tip='',
                    toolbar: QtWidgets.QToolBar = None, visible=True, signal_str=None,
-                   slot: Callable=None, **kwargs):
+                   slot: Callable=None, enabled=True, **kwargs):
         """Create and add a widget to a toolbar
 
         Parameters
@@ -277,6 +289,8 @@ class ActionManager:
             an attribute of type Signal of the widget
         slot: Callable
             a callable connected to the signal
+        enabled: bool
+            enable state of the widget
         kwargs: dict
             variable named arguments passed as is to the widget constructor
         Returns
@@ -286,7 +300,7 @@ class ActionManager:
         if toolbar is None:
             toolbar = self._toolbar
         widget = addwidget(klass, *args, tip=tip, toolbar=toolbar, visible=visible, signal_str=signal_str,
-                           slot=slot, **kwargs)
+                           slot=slot, enabled=enabled, **kwargs)
         if widget is not None:
             self._actions[short_name] = widget
         else:
@@ -424,8 +438,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list)
-    def is_action_visible(self, actions_name: list):
+    @dispatch(Iterable)
+    def is_action_visible(self, actions_name: IterableType):
         """Check the visibility of a given action or the list of an action"""
         isvisible = False
         for action_name in actions_name:
@@ -441,8 +455,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list)
-    def is_action_checked(self, actions_name: list):
+    @dispatch(Iterable)
+    def is_action_checked(self, actions_name: IterableType):
         """Get the CheckState of a given action or a list of actions"""
         ischecked = False
         for action_name in actions_name:
@@ -458,8 +472,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list, bool)
-    def set_action_visible(self, actions_name: list, visible=True):
+    @dispatch(Iterable, bool)
+    def set_action_visible(self, actions_name: IterableType, visible=True):
         """Set the visibility of a given action or a list of an action"""
         for action_name in actions_name:
             self.set_action_visible(action_name, visible)
@@ -473,8 +487,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list, bool)
-    def set_action_checked(self, actions_name: list, checked=True):
+    @dispatch(Iterable, bool)
+    def set_action_checked(self, actions_name: IterableType, checked=True):
         """Set the CheckedState of a given action or a list of actions"""
         for action_name in actions_name:
             self.set_action_checked(action_name, checked)
@@ -488,8 +502,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list, bool)
-    def set_action_enabled(self, actions_name: list, enabled=True):
+    @dispatch(Iterable, bool)
+    def set_action_enabled(self, actions_name: IterableType, enabled=True):
         """Set the EnabledState of a given action or a list of actions"""
         for action_name in actions_name:
             self.set_action_enabled(action_name, enabled)
@@ -503,8 +517,8 @@ class ActionManager:
             raise KeyError(f'The action with name: {action_name} is not referenced'
                            f' in the actions list: {self._actions}')
 
-    @dispatch(list)
-    def is_action_checked(self, actions_name: list):
+    @dispatch(Iterable)
+    def is_action_checked(self, actions_name: IterableType):
         """Get the EnabledState of a given action or a list of actions"""
         is_enabled = False
         for action_name in actions_name:

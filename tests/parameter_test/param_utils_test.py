@@ -241,4 +241,5 @@ def test_ParameterWithPath_serialize():
         putils.ser_factory.get_apply_serializer(p1_with_path))
     assert param_back.path == p1_with_path.path
     assert putils.compareParameters(param_back.parameter, p1_with_path.parameter)
+    assert type(p1_with_path.parameter) == type(param_back.parameter)
 

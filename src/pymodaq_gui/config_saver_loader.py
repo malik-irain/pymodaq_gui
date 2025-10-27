@@ -2,15 +2,16 @@ from abc import abstractproperty
 from collections.abc import Iterable
 
 
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 from typing import Iterable as IterableType
 
 
 from pymodaq_utils.config import (BaseConfig, recursive_iterable_flattening, ConfigError,
                                   get_set_config_dir)
+from pymodaq_gui.parameter import Parameter
 
 if TYPE_CHECKING:
-    from pyqtgraph.parametertree import Parameter
+    from pymodaq_gui.parameter import Parameter
 
 
 def get_set_roi_path():
@@ -79,16 +80,17 @@ class ConfigSaverLoader:
             else:
                 self.load_config(child)
 
-    def save_config(self):
+    def save_config(self, param_to_save: Optional[Parameter] = None):
         from pymodaq_gui.parameter import utils as putils
 
         for param in putils.iter_children_params(self.base_param, []):
-            path_param = self.base_path[:]
-            path_param.extend(putils.get_param_path(param)[1:])
-            try:
-                if 'group' not in param.opts['type']:
-                    self.config[tuple(path_param)] = param.value()
-            except Exception as e:
-                pass
+            if param_to_save is None or param == param_to_save:
+                path_param = self.base_path[:]
+                path_param.extend(putils.get_param_path(param)[1:])
+                try:
+                    if 'group' not in param.opts['type']:
+                        self.config[tuple(path_param)] = param.value()
+                except Exception as e:
+                    pass
         self.config.save()
 

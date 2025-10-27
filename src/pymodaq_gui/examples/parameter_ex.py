@@ -154,7 +154,8 @@ class ParameterEx(ParameterManager):
             self.settings.child('numbers', 'linearslidefloat').setOpts(bounds=limits) # or like this!
 
     def options_changed(self, param, data: dict):
-        print(f'{param} option has been changed: {data}')
+        if data.get("visible", None) is None:
+            print(f'{param} option has been changed: {data}')
 
     def limits_changed(self, param, data):
         print(f'{param} limits have been changed: {data}')
