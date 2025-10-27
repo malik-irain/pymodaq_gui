@@ -79,8 +79,11 @@ class TableModel(QtCore.QAbstractTableModel):
         else:
             return 0
 
-    def get_data(self, row, col):
-        return self._data[row][col]
+    def get_data(self, row, col=None):
+        if col is None:
+            return self._data[row]
+        else:
+            return self._data[row][col]
 
     def get_data_all(self):
         return self._data
