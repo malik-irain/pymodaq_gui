@@ -96,10 +96,10 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role):
         if index.isValid():
-            if role == Qt.DisplayRole or role == Qt.EditRole:
+            if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
                 dat = self._data[index.row()][index.column()]
                 return dat
-            elif role == Qt.CheckStateRole and index.column() == 0 and self._show_checkbox:
+            elif role == Qt.ItemDataRole.CheckStateRole and index.column() == 0 and self._show_checkbox:
                 if self._checked[index.row()]:
                     return Qt.CheckState.Checked
                 else:
@@ -113,8 +113,8 @@ class TableModel(QtCore.QAbstractTableModel):
     #         self.headerDataChanged.emit(orientation, 0, section)
 
     def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 if section >= len(self.header):
                     return QVariant()
                 else:
@@ -126,19 +126,19 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def flags(self, index):
 
-        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+        f = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsDragEnabled
         if index.column() < len(self.editable):
             if self.editable[index.column()]:
-                f |= Qt.ItemIsEditable
+                f |= Qt.ItemFlag.ItemIsEditable
         if index.column() == 0:
-            f |= Qt.ItemIsUserCheckable
+            f |= Qt.ItemFlag.ItemIsUserCheckable
 
         if not index.isValid():
-            f |= Qt.ItemIsDropEnabled
+            f |= Qt.ItemFlag.ItemIsDropEnabled
         return f
 
     def supportedDropActions(self):
-        return Qt.MoveAction | Qt.CopyAction
+        return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
     def validate_data(self, row, col, value):
         """
@@ -201,6 +201,7 @@ class TableModel(QtCore.QAbstractTableModel):
             self._checked.pop(row + ind)
         self.endRemoveRows()
         return True
+
 
 
 class BooleanDelegate(QtWidgets.QStyledItemDelegate):
