@@ -14,6 +14,8 @@ import pytest
 from pytest import fixture, approx
 import numpy as np
 import pyqtgraph as pg
+
+from pymodaq_gui.plotting.items.roi import RectROI, EllipseROI
 from pymodaq_gui.plotting.utils.plot_utils import RoiInfo, Point
 
 from pyqtgraph import mkPen
@@ -380,11 +382,12 @@ class TestROI:
         prog.show_data(data)
 
         index_roi, roi, roi_type = create_one_roi(prog, qtbot, roitype='RectROI')
-        assert roi.type() == 'RectROI'
+
+        assert isinstance(roi, RectROI)
         assert roi.index == 0
 
         index_roi, roi, roi_type = create_one_roi(prog, qtbot, roitype='EllipseROI')
-        assert roi.type() == 'EllipseROI'
+        assert isinstance(roi, EllipseROI)
         assert roi.index == 1
 
     def test_remove_roi(self, init_viewer2D):
