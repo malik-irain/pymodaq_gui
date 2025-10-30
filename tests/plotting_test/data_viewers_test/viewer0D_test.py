@@ -49,11 +49,13 @@ class TestViewer0D:
         
         prog = Viewer0D(None)
         assert isinstance(prog.parent, QtWidgets.QWidget)
+        prog.parent.deleteLater()
 
     def test_actions(self, init_viewer0d):
         prog, qtbot = init_viewer0d
         for action_name in ['clear', 'Nhistory', 'show_data_as_list']:
             assert prog.view.has_action(action_name)
+        prog.parent.deleteLater()
 
     def test_clear_action(self, init_viewer0d):
         prog, qtbot = init_viewer0d
@@ -67,7 +69,7 @@ class TestViewer0D:
         prog.view.get_action('clear').trigger()
 
         assert prog.view.data_displayer.axis.size == 0
-
+        prog.parent.deleteLater()
     def test_show_datalist(self, init_viewer0d):
         prog, qtbot = init_viewer0d
 
@@ -77,7 +79,8 @@ class TestViewer0D:
         assert prog.view.values_list.isVisible()
         prog.view.get_action('show_data_as_list').trigger()
         assert not prog.view.values_list.isVisible()
-        
+        prog.parent.deleteLater()
+
     def test_clear_data(self, init_viewer0d):
         prog, qtbot = init_viewer0d
 
@@ -88,4 +91,4 @@ class TestViewer0D:
         assert prog.view.data_displayer.axis.size != 0
         prog.view.data_displayer.clear_data()
         assert prog.view.data_displayer.axis.size == 0
-
+        prog.parent.deleteLater()
