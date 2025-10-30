@@ -13,7 +13,7 @@ class SearchLineEdit(QLineEdit):
 
         # Debounce timer
         self.debounce_ms = debounce_ms
-        self.search_timer = QTimer()
+        self.search_timer = QTimer(self)
         self.search_timer.setSingleShot(True)
         self.search_timer.timeout.connect(self._emit_debounced_search)
 
@@ -47,6 +47,7 @@ class SearchLineEdit(QLineEdit):
 
         # Set fixed width for small widget
         self.setFixedWidth(200)
+
 
     def _on_text_changed(self, text):
         """Called on every keystroke"""
