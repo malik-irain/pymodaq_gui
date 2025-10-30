@@ -38,14 +38,15 @@ class CustomApp(QObject, ActionManager, ParameterManager):
     log_signal = QtCore.Signal(str)
     params = []
 
-    def __init__(self, parent: Union[DockArea, QtWidgets.QMainWindow, QtWidgets.QWidget]):
+    def __init__(self, parent: Union[DockArea, QtWidgets.QMainWindow, QtWidgets.QWidget] = None):
         QObject.__init__(self)
         ActionManager.__init__(self)
         ParameterManager.__init__(self)
 
-        if not isinstance(parent, DockArea):
-            if not isinstance(parent, QtWidgets.QWidget):
-                raise Exception('no valid parent container, expected a DockArea or a least a QWidget')
+        if not (isinstance(parent, DockArea) or
+                isinstance(parent, QtWidgets.QMainWindow) or
+                isinstance(parent, QtWidgets.QWidget)):
+            parent = QtWidgets.QWidget()
 
         self.parent = parent
         if isinstance(parent, DockArea):
@@ -60,15 +61,14 @@ class CustomApp(QObject, ActionManager, ParameterManager):
 
         self.docks: Dict[str, Dock] = dict([])
         self.statusbar = None
-        self._toolbar = QtWidgets.QToolBar()
         self._menubar: QtWidgets.QMenuBar = None
+        self.set_toolbar(QtWidgets.QToolBar()) # create self._toolbar
 
         if self.mainwindow is not None:
             self.mainwindow.addToolBar(self._toolbar)
             self._menubar = self.mainwindow.menuBar()
             self.statusbar = self.mainwindow.statusBar()
 
-        self.set_toolbar(self._toolbar)
 
     def setup_ui(self):
         self.setup_docks()
