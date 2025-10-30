@@ -187,7 +187,6 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
                 super().setVisible(visible)
 
             def __getattr__(self, name : str):
-                print(f'calling {name}')
                 return getattr(self._widget, name)
 
             @property
