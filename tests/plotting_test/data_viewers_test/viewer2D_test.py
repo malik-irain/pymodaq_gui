@@ -73,27 +73,27 @@ def init_prog_show_data(init_viewer2D, distribution='uniform'):
 
 def create_one_roi(prog, qtbot, roitype='RectROI'):
     prog.view.get_action('roi').trigger()
-    QtWidgets.QApplication.processEvents()
+    qtbot.wait(0)
     with qtbot.waitSignal(prog.view.roi_manager.new_ROI_signal, timeout=10000) as blocker:
         prog.view.roi_manager.add_roi_programmatically(roitype)
     roi_name = blocker.args[0]    
     roi = prog.view.roi_manager.get_roi(roi_name)
     index_roi = roi.index
     roi_type = roi.type()
-    QtWidgets.QApplication.processEvents()
+    qtbot.wait(0)
     return index_roi, roi, roi_type
 
 
 def copy_one_roi(prog, qtbot, roi ):
     prog.view.get_action('roi').trigger()
-    QtWidgets.QApplication.processEvents()
+    qtbot.wait(0)
     with qtbot.waitSignal(prog.view.roi_manager.new_ROI_signal, timeout=10000) as blocker:
         prog.view.roi_manager.copy_ROI(roi)
     roi_name = blocker.args[0]    
     roi = prog.view.roi_manager.get_roi(roi_name)
     index_roi = roi.index
     roi_type = roi.type()
-    QtWidgets.QApplication.processEvents()
+    qtbot.wait(0)
     return index_roi, roi, roi_type
 
 
@@ -230,7 +230,7 @@ class TestViewer2D:
     def test_update_data_roi(self, init_prog_show_data):
         prog, qtbot, _ = init_prog_show_data
         create_one_roi(prog, qtbot)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         with qtbot.waitSignal(prog.data_to_export_signal, timeout=1000) as blocker:
             prog.update_data()
@@ -238,7 +238,7 @@ class TestViewer2D:
     def test_update_data_crosshair(self, init_prog_show_data):
         prog, qtbot, _ = init_prog_show_data
         prog.view.get_action('crosshair').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         with qtbot.waitSignal(prog.crosshair_dragged, timeout=1000) as blocker:
             prog.update_data()
@@ -398,7 +398,7 @@ class TestROI:
         index_roi, roi, roi_type = create_one_roi(prog, qtbot, roitype='RectROI')
 
         prog.view.roi_manager.remove_roi_programmatically(index_roi)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
 
     def test_copy_roi(self, init_viewer2D):
@@ -415,7 +415,7 @@ class TestROI:
 
 
         prog.view.roi_manager.remove_roi_programmatically(index_roi)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
     def test_update_color_roi(self, init_viewer2D):
         prog, qtbot = init_viewer2D
@@ -426,7 +426,7 @@ class TestROI:
 
         prog.view.roi_manager.settings.child('ROIs', roi_format(index_roi), 'Color').setValue('b')
         roi = prog.view.roi_manager.get_roi_from_index(index_roi)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert roi.pen == mkPen('b')
 
     def test_data_from_roi(self, init_viewer2D):
@@ -531,7 +531,7 @@ class TestIsocurve:
         prog.view.get_action('isocurve').trigger()
         prog.view.isocurver._isoLine.setValue(ISOLEVEL)
         prog.view.isocurver._isoLine.sigDragged.emit(prog.view.isocurver._isoLine)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert prog.view.isocurver._isocurve_item.level == ISOLEVEL
 
 
@@ -561,18 +561,18 @@ class TestCrosshair:
         assert not prog.view.is_action_visible('position')
 
         prog.view.get_action('crosshair').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         assert prog.view.is_action_checked('crosshair')
         assert prog.view.is_action_visible('position')
         assert prog.view.crosshair.isVisible()
 
         prog.view.get_action('crosshair').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         prog.view.get_action('roi').trigger()  # will keep lineout_widgets visible so we can check
         # if crosshair lineouts are still visible
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         assert not prog.view.is_action_checked('crosshair')
         assert not prog.view.is_action_visible('position')
@@ -582,7 +582,7 @@ class TestCrosshair:
         prog, qtbot = init_viewer2D
         data = init_data()
         prog.show_data(data)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         XCROSS = 24
         YCROSS = 75
 
@@ -627,7 +627,7 @@ class TestImageDisplayer:
         prog, qtbot = init_viewer2D
         data = init_data()
         prog.show_data(data)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         with pytest.raises(KeyError):
             prog.view.data_displayer.get_image('not a valid image name')
@@ -636,11 +636,11 @@ class TestImageDisplayer:
         prog, qtbot = init_viewer2D
         data = init_data()
         prog.show_data(data)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
         data = init_data(uniform=False)
         prog.show_data(data)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
 
 
 class TestModifyImages:
@@ -653,7 +653,7 @@ class TestModifyImages:
         assert np.any(prog._datas[0] == approx(data[0]))
 
         prog.view.get_action('flip_ud').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert np.any(prog._datas[0] == approx(np.flipud(data[0])))
 
     def test_FlipLR_action(self, init_viewer2D):
@@ -665,20 +665,20 @@ class TestModifyImages:
             prog.show_data(data)
 
         prog.view.get_action('flip_lr').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert np.any(prog._datas[0] == approx(np.fliplr(data[0])))
 
         prog.view.get_action('flip_lr').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert np.any(prog._datas[0] == approx(data[0]))
 
     def test_rotate_action(self, init_viewer2D):
         prog, qtbot = init_viewer2D
         data = init_data()
         prog.show_data(data)
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         prog.view.get_action('rotate').trigger()
-        QtWidgets.QApplication.processEvents()
+        qtbot.wait(0)
         assert np.any(prog._datas[0] == approx(np.flipud(np.transpose(data[0]))))
 
 
