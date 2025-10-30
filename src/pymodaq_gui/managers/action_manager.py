@@ -163,10 +163,42 @@ def addwidget(klass: Union[str, QtWidgets.QWidget, object], *args, tip='', toolb
             return None
 
     if toolbar is not None:
+        class WidgetActionProxy(QtWidgets.QWidget):
+            '''
+                Wrapper class of a Widget and its associated toolbar Action.
+
+                All methods call are forwarded to the wrapped Widget. Even its class name
+                is copied.
+
+                Only the setVisible method is different, as the Action need to be hidden.
+
+               (monkey-patching setVisible on the widget wasn't compatible with PySide6)
+            '''
+            def __init__(self, widget : QtWidgets.QWidget, action : QtWidgets.QAction):
+                super().__init__(widget.parent())
+                self.setParent(widget)
+
+                self._widget = widget
+                self._action = action
+
+            def setVisible(self, visible : bool):
+                self._action.setVisible(visible)
+                self._widget.setVisible(visible)
+                super().setVisible(visible)
+
+            def __getattr__(self, name : str):
+                print(f'calling {name}')
+                return getattr(self._widget, name)
+
+            @property
+            def __class__(self):
+                return self._widget.__class__
+
+
         action: QtWidgets.QAction = toolbar.addWidget(widget)
         action.setVisible(visible)
         action.setToolTip(tip)
-        widget.setVisible = action.setVisible #because visibility is only possible on the underlying QAction
+        widget = WidgetActionProxy(widget, action)
     else:
         widget.setVisible(visible)
         widget.setToolTip(tip)
