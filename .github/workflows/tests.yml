@@ -27,10 +27,6 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
         qt-backend: ["pyqt5", "pyqt6", "pyside6"]
     runs-on: ${{ matrix.os }}
-    env:
-      DISPLAY: ':99'
-      QT_DEBUG_PLUGINS: 1
-
     steps:     
       # Get the branch name for the badge generation
       - name: Extract branch name
@@ -80,25 +76,7 @@ jobs:
         id: tests
         run: |
           mkdir coverage
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            export QT_DEBUG_PLUGINS=1
-            export QT_OPENGL=software
-            export QT_QPA_PLATFORM=offscreen
-            export LIBGL_ALWAYS_SOFTWARE=1
-            export MESA_LOADER_DRIVER_OVERRIDE=softpipe
-            export QT_XCB_GL_INTEGRATION=none 
-
-            xvfb-run --server-args='-screen 0 1024x768x24' python -m pytest -vv --cov=pymodaq_gui
-          else
-            set QT_DEBUG_PLUGINS=1
-            set QT_OPENGL=software
-            set QT_QPA_PLATFORM=offscreen
-            set LIBGL_ALWAYS_SOFTWARE=1
-            set MESA_LOADER_DRIVER_OVERRIDE=softpipe
-            set QT_XCB_GL_INTEGRATION=none 
-            
-            pytest -vv --cov=pymodaq_gui
-          fi
+          pytest -vv --cov=pymodaq_gui
           mv .coverage coverage/coverage_${{ matrix.os }}_${{ matrix.python-version }}_${{ matrix.qt-backend }}
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4.6.2
