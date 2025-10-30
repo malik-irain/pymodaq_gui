@@ -635,7 +635,7 @@ class ActionManager:
         if isinstance(obj, QtWidgets.QToolBar) or isinstance(obj, QtWidgets.QMenu):
             obj.addAction(self._actions[action_name])
 
-    def connect_action(self, name, slot, connect=True, signal_name=''):
+    def connect_action(self, name, slot=None, connect=True, signal_name=''):
         """Connect (or disconnect) the action referenced by name to the given slot
 
         Parameters
