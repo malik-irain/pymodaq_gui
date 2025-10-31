@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Union
 from pathlib import Path
 
@@ -11,6 +13,9 @@ from qtpy.QtCore import QDateTime, QTime
 from pymodaq_gui.parameter import Parameter
 
 from pyqtgraph.parametertree.Parameter import PARAM_TYPES, PARAM_NAMES
+
+
+VALID_FOR_CONFIGURATION = 'valid_for_configuration'
 
 
 def walk_parameters_to_xml(parent_elt=None, param=None):
@@ -166,6 +171,9 @@ def dict_from_param(param):
             readonly = '0'
     opts.update(dict(readonly=readonly))
 
+    if VALID_FOR_CONFIGURATION in param.opts:
+        opts.update({VALID_FOR_CONFIGURATION: '1' if param.opts[VALID_FOR_CONFIGURATION] else '0'})
+
     # if 'limits' in param.opts:
     #     values = str(param.opts['limits'])
     #     opts.update(dict(values=values))
@@ -258,11 +266,21 @@ def elt_to_dict(el):
         readonly = bool(int(el.get('readonly')))
     param.update(dict(readonly=readonly))
 
+    if VALID_FOR_CONFIGURATION in el.attrib.keys():
+        valid = bool(int(el.get(VALID_FOR_CONFIGURATION)))
+        param.update({VALID_FOR_CONFIGURATION: valid})
+
     if 'show_pb' in el.attrib.keys():
         show_pb = bool(int(el.get('show_pb')))
     else:
         show_pb = False
     param.update(dict(show_pb=show_pb))
+
+    if 'readonly' not in el.attrib.keys():
+        readonly = False
+    else:
+        readonly = bool(int(el.get('readonly')))
+    param.update(dict(readonly=readonly))
 
     if 'filetype' in el.attrib.keys():
         filetype = bool(int(el.get('filetype')))
@@ -423,6 +441,7 @@ def walk_xml_to_parameter(params=[], XML_elt=None):
         raise e
     return params
 
+
 def set_dict_from_el(el):
     """Convert an element into a dict
     ----------
@@ -542,6 +561,20 @@ def XML_string_to_parameter(xml_string):
     return params
 
 
+def XML_string_to_parameter_including_first(xml_string) -> dict:
+    """
+        Convert a xml string into a dict for initialize pyqtgraph parameter object.
+    """
+    root = ET.fromstring(xml_string)
+    tree = ET.ElementTree(root)
+
+    param_dict = set_dict_from_el(root)
+    if len(root) > 0:
+        param_dict['children'] = walk_xml_to_parameter(params=[], XML_elt=root)
+
+    return param_dict
+
+
 def XML_string_to_pobject(xml_string) -> Parameter:
     """
     return a Parameter object from its *translated* version as a XML string
@@ -557,5 +590,7 @@ def XML_string_to_pobject(xml_string) -> Parameter:
     --------
     parameter_to_xml_string
     """
-    return Parameter.create(name='settings', type='group',
-                            children=XML_string_to_parameter(xml_string))
+    return Parameter.create(**XML_string_to_parameter_including_first(xml_string))
+
+
+
