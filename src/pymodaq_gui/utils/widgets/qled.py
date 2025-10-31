@@ -60,3 +60,7 @@ class QLED(QLabel):
             else:
                 self.set_as_true()
             self.value_changed.emit(not self.state)
+
+    def setReadOnly(self, isreadonly: bool):
+        self.clickable = not isreadonly
+
