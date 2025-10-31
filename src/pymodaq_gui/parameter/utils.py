@@ -73,7 +73,7 @@ class ParameterWithPath(SerializableBase):
         """
         path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str, False)
         param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes, False)
-        param_dict = ioxml.XML_string_to_parameter_including_first(param_as_xml)
+        param_dict = ioxml.xml_string_to_parameter_dict(param_as_xml)
         param_obj = Parameter.create(**param_dict)
         return ParameterWithPath(param_obj, path), remaining_bytes
 

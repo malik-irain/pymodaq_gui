@@ -532,38 +532,16 @@ def XML_file_to_parameter(file_name: Union[str, Path]) -> list:
 
 
 def XML_string_to_parameter(xml_string):
-    """
-        Convert a xml string into a list of dict for initialize pyqtgraph parameter object.
-
-        =============== =========== ================================
-        **Parameters**   **Type**    **Description**
-
-        xml_string       string      the xml string to be converted
-        =============== =========== ================================
-
-        Returns
-        -------
-        params: a parameter list of dict to init a parameter
-
-        See Also
-        --------
-        walk_parameters_to_xml
-
-        Examples
-        --------
+    """ Convert a xml string into a list of dict for initialize pyqtgraph parameter object.
     """
     root = ET.fromstring(xml_string)
-    tree = ET.ElementTree(root)
-
-    # tree.write('test.xml')
     params = walk_xml_to_parameter(params=[], XML_elt=root)
-
     return params
 
 
-def XML_string_to_parameter_including_first(xml_string) -> dict:
+def xml_string_to_parameter_dict(xml_string) -> dict:
     """
-        Convert a xml string into a dict for initialize pyqtgraph parameter object.
+        Convert a xml string into a dict to initialize pyqtgraph parameter object.
     """
     root = ET.fromstring(xml_string)
     tree = ET.ElementTree(root)
@@ -574,23 +552,23 @@ def XML_string_to_parameter_including_first(xml_string) -> dict:
 
     return param_dict
 
+def xml_string_to_parameter(xml_string) -> Parameter:
+    return Parameter.create(**xml_string_to_parameter_dict(xml_string))
+
 
 def XML_string_to_pobject(xml_string) -> Parameter:
     """
-    return a Parameter object from its *translated* version as a XML string
+    return a Parameter object from its deserialized version from a XML string
+
+    Deprecated as not symetric with parameter_to_xml_string
+
     Parameters
     ----------
     xml_string: (str) string representation of a Parameter Object
 
-    Returns
-    -------
-    Parameter
-
-    See Also
-    --------
-    parameter_to_xml_string
     """
-    return Parameter.create(**XML_string_to_parameter_including_first(xml_string))
+    return Parameter.create(name='settings', type='group',
+                            children=XML_string_to_parameter(xml_string))
 
 
 
