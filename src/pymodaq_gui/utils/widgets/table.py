@@ -189,7 +189,8 @@ class TableModel(QtCore.QAbstractTableModel):
     def insertRows(self, row, count, parent):
         self.beginInsertRows(QtCore.QModelIndex(), row, row + count - 1)
         for ind in range(count):
-            self._data.insert(row + ind, self.data_tmp)
+            self._data.insert(row + ind, self.data_tmp[ind] if
+            (hasattr(self.data_tmp, '__len__') and len(self.data_tmp) == count) else self.data_tmp)
             self._checked.insert(row + ind, False)
         self.endInsertRows()
         return True

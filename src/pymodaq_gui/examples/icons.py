@@ -1,8 +1,8 @@
 import sys
 
-from qtpy.QtWidgets import (QApplication, QGridLayout, QPushButton, QStyle,
+from PyQt6.QtWidgets import (QApplication, QGridLayout, QPushButton, QStyle,
                              QWidget, QVBoxLayout)
-from qtpy.QtGui import QIcon
+from PyQt6.QtGui import QIcon
 
 
 class Icons():
