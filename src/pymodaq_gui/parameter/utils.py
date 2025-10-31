@@ -1,9 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Tuple, Any, Union
-from dataclasses import Field, fields
+from typing import List, Tuple, Union
 import numpy as np
 from collections import OrderedDict
-from dataclasses import dataclass
 from pymodaq_utils.utils import find_keys_from_val
 from pymodaq_utils.serialize.factory import SerializableFactory, SerializableBase
 from pymodaq_gui.parameter import ioxml
@@ -75,8 +73,8 @@ class ParameterWithPath(SerializableBase):
         """
         path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str, False)
         param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes, False)
-        param_dict = ioxml.XML_string_to_parameter(param_as_xml)
-        param_obj = Parameter.create(**param_dict[0])
+        param_dict = ioxml.XML_string_to_parameter_including_first(param_as_xml)
+        param_obj = Parameter.create(**param_dict)
         return ParameterWithPath(param_obj, path), remaining_bytes
 
 
@@ -472,3 +470,4 @@ if __name__ == '__main__':              # pragma: no cover
 
     d['readonly'] = False
     print(parent[0]['children'][1]['children'])
+
