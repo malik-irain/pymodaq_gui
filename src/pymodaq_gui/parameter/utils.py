@@ -163,9 +163,8 @@ def compareParameters(param1:Parameter, param2:Parameter, with_self: bool = True
     """
     is_same = getOpts(param1) == getOpts(param2)
     if with_self:        
-        is_same and (param1.opts == param2.opts)        
+        is_same = is_same and (param1.opts == param2.opts)        
     return is_same
-
     
 def compareStructureParameter(param1:Parameter, param2: Parameter,)-> bool:
     """Compare the structure of two parameters with their children, return True if structure is identical
@@ -196,7 +195,7 @@ def compareValuesParameter(param1:Parameter, param2: Parameter, with_self: bool 
     """    
     is_same = getValues(param1) == getValues(param2)
     if with_self:        
-        is_same and (param1.value == param2.value)        
+        is_same = is_same and (param1.value == param2.value)        
     return is_same
 
 
