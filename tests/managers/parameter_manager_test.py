@@ -82,7 +82,7 @@ def test_load(qtbot, tmp_path):
     ptree.save_settings_slot(file_path)
 
     parameter_copy = Parameter.create(name='settings', type='group', children=ParameterEx.params)
-    assert compareValuesParameter(ptree.settings, parameter_copy)
+    assert compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
 
     parameters = iter_children_params(ptree.settings, childlist=[])
     parameters_copy = iter_children_params(parameter_copy, childlist=[])
@@ -99,7 +99,7 @@ def test_load(qtbot, tmp_path):
             elif 'tabular_table' == parameter.opts['type']:
                 parameter.setValue(TableModel([[0.5, 0.2, 0.6]], ['value20', 'val2', '555']))
 
-    assert not compareValuesParameter(ptree.settings, parameter_copy)
+    assert not compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
     assert compareStructureParameter(ptree.settings, parameter_copy)
 
     ptree.update_settings_slot(file_path)
@@ -109,7 +109,7 @@ def test_load(qtbot, tmp_path):
         if parameter.value() != pcopy.value():
             print(parameter)
 
-    assert compareValuesParameter(ptree.settings, parameter_copy)
+    assert compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
     assert compareStructureParameter(ptree.settings, parameter_copy)
 
     ptree.settings_tree.close()
