@@ -147,22 +147,24 @@ def getValues(param:Parameter,) -> OrderedDict:
     return param.getValues()
 
 
-def compareParameters(param1:Parameter, param2:Parameter, opts: list = None)-> bool:
+def compareParameters(param1:Parameter, param2:Parameter, with_self: bool = True)-> bool:
     """Compare the structure and the opts of two parameters with their children,
-     return True if structure and all opts are identical
+     return True if structure and all opts are identical.
+     If with_self is False, only the children opts are compared.
         Parameters
         ----------
         param1: Parameter
         param2: Parameter   
+        with_self: bool
         
         Returns
         -------
         Bool    
     """
-    if opts is None:
-        opts = []
-    return getOpts(param1) == getOpts(param2)
-
+    is_same = getOpts(param1) == getOpts(param2)
+    if with_self:        
+        is_same = is_same and (param1.opts == param2.opts)        
+    return is_same
     
 def compareStructureParameter(param1:Parameter, param2: Parameter,)-> bool:
     """Compare the structure of two parameters with their children, return True if structure is identical
@@ -178,18 +180,23 @@ def compareStructureParameter(param1:Parameter, param2: Parameter,)-> bool:
     return getStruct(param1) == getStruct(param2)
 
 
-def compareValuesParameter(param1:Parameter, param2: Parameter,)-> bool:
+def compareValuesParameter(param1:Parameter, param2: Parameter, with_self: bool = True)-> bool:
     """Compare the structure and the values of two parameters with their children, return True if structures and values are identical
         Parameters
+        If with_self is False, only the children opts are compared.
         ----------
         param1: Parameter
         param2: Parameter   
+        with_self: bool
         
         Returns
         -------
         Bool    
     """    
-    return getValues(param1) == getValues(param2)    
+    is_same = getValues(param1) == getValues(param2)
+    if with_self:        
+        is_same = is_same and (param1.value == param2.value)        
+    return is_same
 
 
 def iter_children(param, childlist: list = [], filter_type=(), filter_name=(), select_filter=False)-> list:
