@@ -433,6 +433,20 @@ class ActionManager:
 
         return new_menu
 
+    def reference_toolbar(self, short_name: str, toolbar: QtWidgets.QToolBar):
+        """ Add an existing toolbar to the list of managed toolbars"""
+        if short_name not in self._toolbars:
+            self._toolbars[short_name] = toolbar
+        else:
+            raise KeyError(f'Toolbar {short_name} is already existing')
+
+    def reference_menu(self, short_name: str, menu: QtWidgets.QMenu):
+        """ Add an existing toolbar to the list of managed toolbars"""
+        if short_name not in self._menus:
+            self._menus[short_name] = menu
+        else:
+            raise KeyError(f'Menu {short_name} is already existing')
+
     def add_toolbar(self, short_name: str, title: str = '', parent: QtWidgets.QWidget = None) -> QtWidgets.QToolBar:
         """Create and add a toolbar
 

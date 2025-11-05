@@ -70,6 +70,7 @@ class CustomApp(QObject, ActionManager, ParameterManager):
             self.mainwindow.addToolBar(self._toolbar)
             self._menubar = self.mainwindow.menuBar()
             self.statusbar = self.mainwindow.statusBar()
+            self.reference_toolbar('main', self._toolbar)
 
 
     def setup_ui(self):
