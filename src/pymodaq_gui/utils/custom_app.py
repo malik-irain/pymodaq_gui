@@ -8,6 +8,7 @@ from pyqtgraph.dockarea import DockArea
 from pymodaq_gui.utils.dock import DockArea, Dock
 from pymodaq_gui.managers.action_manager import ActionManager
 from pymodaq_gui.managers.parameter_manager import ParameterManager
+from pymodaq_gui.parameter import ParameterTree
 
 
 class CustomApp(QObject, ActionManager, ParameterManager):
@@ -38,14 +39,16 @@ class CustomApp(QObject, ActionManager, ParameterManager):
     log_signal = QtCore.Signal(str)
     params = []
 
-    def __init__(self, parent: Union[DockArea, QtWidgets.QMainWindow, QtWidgets.QWidget]):
+    def __init__(self, parent: Union[DockArea, QtWidgets.QMainWindow, QtWidgets.QWidget] = None,
+                 tree: ParameterTree = None):
         QObject.__init__(self)
         ActionManager.__init__(self)
-        ParameterManager.__init__(self)
+        ParameterManager.__init__(self, tree=tree)
 
-        if not isinstance(parent, DockArea):
-            if not isinstance(parent, QtWidgets.QWidget):
-                raise Exception('no valid parent container, expected a DockArea or a least a QWidget')
+        if not (isinstance(parent, DockArea) or
+                isinstance(parent, QtWidgets.QMainWindow) or
+                isinstance(parent, QtWidgets.QWidget)):
+            parent = QtWidgets.QWidget()
 
         self.parent = parent
         if isinstance(parent, DockArea):
@@ -60,15 +63,15 @@ class CustomApp(QObject, ActionManager, ParameterManager):
 
         self.docks: Dict[str, Dock] = dict([])
         self.statusbar = None
-        self._toolbar = QtWidgets.QToolBar()
         self._menubar: QtWidgets.QMenuBar = None
+        self.set_toolbar(QtWidgets.QToolBar()) # create self._toolbar
 
         if self.mainwindow is not None:
             self.mainwindow.addToolBar(self._toolbar)
             self._menubar = self.mainwindow.menuBar()
             self.statusbar = self.mainwindow.statusBar()
+            self.reference_toolbar('main', self._toolbar)
 
-        self.set_toolbar(self._toolbar)
 
     def setup_ui(self):
         self.setup_docks()
@@ -81,6 +84,18 @@ class CustomApp(QObject, ActionManager, ParameterManager):
             self.setup_menu()  # for backcompatibility
 
         self.connect_things()
+
+        self.do_things_after_ui_setup()
+
+    def quit_fun(self):
+        """Method to be subclassed in order to define a custom quit function
+        """
+        self.mainwindow.close()
+
+    def do_things_after_ui_setup(self):
+        """Non mandatory method to be subclassed in order to do things after the UI setup
+        """
+        pass
 
     def setup_docks(self):
         """Mandatory method to be subclassed to setup the docks layout

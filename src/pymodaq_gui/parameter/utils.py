@@ -1,9 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Tuple, Any, Union
-from dataclasses import Field, fields
+from typing import List, Tuple, Union
 import numpy as np
 from collections import OrderedDict
-from dataclasses import dataclass
 from pymodaq_utils.utils import find_keys_from_val
 from pymodaq_utils.serialize.factory import SerializableFactory, SerializableBase
 from pymodaq_gui.parameter import ioxml
@@ -34,6 +32,10 @@ class ParameterWithPath(SerializableBase):
 
     def __repr__(self):
         return f'Parameter {self.parameter.name()} with path {self.path}'
+
+    def __eq__(self, other: 'ParameterWithPath'):
+        return (self.path == other.path and
+                compareParameters(self.parameter, other.parameter))
 
     @property
     def parameter(self) -> Parameter:
@@ -71,8 +73,8 @@ class ParameterWithPath(SerializableBase):
         """
         path, remaining_bytes = ser_factory.get_apply_deserializer(bytes_str, False)
         param_as_xml, remaining_bytes = ser_factory.get_apply_deserializer(remaining_bytes, False)
-        param_dict = ioxml.XML_string_to_parameter(param_as_xml)
-        param_obj = Parameter(**param_dict[0])
+        param_dict = ioxml.xml_string_to_parameter_dict(param_as_xml)
+        param_obj = Parameter.create(**param_dict)
         return ParameterWithPath(param_obj, path), remaining_bytes
 
 
@@ -145,21 +147,26 @@ def getValues(param:Parameter,) -> OrderedDict:
     return param.getValues()
 
 
-def compareParameters(param1:Parameter, param2:Parameter, opts: list = [])-> bool:
+def compareParameters(param1:Parameter, param2:Parameter, with_self: bool = True)-> bool:
     """Compare the structure and the opts of two parameters with their children,
-     return True if structure and all opts are identical
+     return True if structure and all opts are identical.
+     If with_self is False, only the children opts are compared.
         Parameters
         ----------
         param1: Parameter
         param2: Parameter   
+        with_self: bool
         
         Returns
         -------
         Bool    
-    """    
-    return getOpts(param1) == getOpts(param2) 
+    """
+    is_same = getOpts(param1) == getOpts(param2)
+    if with_self:        
+        is_same = is_same and (param1.opts == param2.opts)        
+    return is_same
     
-def compareStructureParameter(param1:Parameter,param2:Parameter,)-> bool:  
+def compareStructureParameter(param1:Parameter, param2: Parameter,)-> bool:
     """Compare the structure of two parameters with their children, return True if structure is identical
         Parameters
         ----------
@@ -172,20 +179,27 @@ def compareStructureParameter(param1:Parameter,param2:Parameter,)-> bool:
     """    
     return getStruct(param1) == getStruct(param2)
 
-def compareValuesParameter(param1:Parameter,param2:Parameter,)-> bool:  
+
+def compareValuesParameter(param1:Parameter, param2: Parameter, with_self: bool = True)-> bool:
     """Compare the structure and the values of two parameters with their children, return True if structures and values are identical
         Parameters
+        If with_self is False, only the children opts are compared.
         ----------
         param1: Parameter
         param2: Parameter   
+        with_self: bool
         
         Returns
         -------
         Bool    
     """    
-    return getValues(param1) == getValues(param2)    
+    is_same = getValues(param1) == getValues(param2)
+    if with_self:        
+        is_same = is_same and (param1.value == param2.value)        
+    return is_same
 
-def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_filter=False)-> list:
+
+def iter_children(param, childlist: list = [], filter_type=(), filter_name=(), select_filter=False)-> list:
 
 
     """
@@ -196,10 +210,12 @@ def iter_children(param, childlist=[], filter_type=(), filter_name=(), select_fi
     list
         The list of the children name from the given node.       
     """
-    return iter_children_params(param, childlist=childlist, output_type='name', filter_type=(), filter_name=(), select_filter=False)
+    return iter_children_params(param, childlist=childlist, output_type='name',
+                                filter_type=(), filter_name=(), select_filter=False)
 
 
-def iter_children_params(param, childlist=[], output_type=None, filter_type=(), filter_name=(), select_filter=False)-> list:
+def iter_children_params(param, childlist: list = [], output_type=None,
+                         filter_type=(), filter_name=(), select_filter=False)-> list:
     """
     Get a list of parameters under a given Parameter.
 
@@ -224,7 +240,6 @@ def iter_children_params(param, childlist=[], output_type=None, filter_type=(), 
     list
         The list of the children from the given node.    
     """
-
     for child in param.children():
         # XNOR Gate        
         is_filtered = child.type() in filter_type or child.name() in filter_name
@@ -244,7 +259,7 @@ def iter_children_params(param, childlist=[], output_type=None, filter_type=(), 
     return childlist
 
 
-def get_param_from_name(parent, name) -> Parameter:
+def get_param_from_name(parent: Parameter, name) -> Parameter:
     """Get Parameter under parent whose name is name
 
     Parameters
@@ -462,3 +477,4 @@ if __name__ == '__main__':              # pragma: no cover
 
     d['readonly'] = False
     print(parent[0]['children'][1]['children'])
+

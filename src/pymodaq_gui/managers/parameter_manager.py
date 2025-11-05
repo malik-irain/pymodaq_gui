@@ -231,7 +231,6 @@ class ParameterManager:
             settings_name: Optional[str] = None,
             action_list: tuple = ("search", "save", "update", "load"),
             tree: ParameterTree = None
-
     ):
         self._current_filter_text = ""
         if settings_name is None:
@@ -268,12 +267,12 @@ class ParameterManager:
         )
 
     @property
-    def settings_tree(self):
+    def settings_tree(self) -> QtWidgets.QWidget:
         """QWidget: The main widget containing the parameter tree and toolbar."""
         return self._settings_tree.widget
 
     @property
-    def tree(self):
+    def tree(self) -> ParameterTree:
         """ParameterTree: The underlying parameter tree widget."""
         return self._settings_tree.tree
 

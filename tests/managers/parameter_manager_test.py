@@ -1,3 +1,4 @@
+
 1# -*- coding: utf-8 -*-
 """
 Created the 07/11/2023
@@ -8,6 +9,7 @@ from collections import OrderedDict
 import pytest
 from qtpy import QtWidgets
 
+
 from pyqtgraph.parametertree import Parameter
 
 from pymodaq_gui.examples.parameter_ex import ParameterEx
@@ -16,6 +18,8 @@ from pymodaq_gui.parameter.utils import (getValues,getStruct,
     compareStructureParameter, compareValuesParameter)
 from pymodaq_gui.utils.widgets.table import TableModel
 from pymodaq_gui.managers.parameter_manager import ParameterManager
+
+
 
 
 @pytest.fixture
@@ -41,35 +45,44 @@ class RealParameterManager(ParameterManager):
     ]},
 
 
-def test_parameter_manager(qtbot):
 
+def test_parameter_manager_trace(qtbot):
     param_manager = RealParameterManager()
-    param_manager.settings_tree.show()
+    tree = param_manager.settings_tree
+    tree.show()
 
-    assert hasattr(param_manager.settings_tree, 'header')
-    assert hasattr(param_manager.settings_tree, 'setMinimumHeight')
-    assert hasattr(param_manager.settings_tree, 'listAllItems')
+    # Assertions
+    assert hasattr(tree, 'header')
+    assert hasattr(tree, 'setMinimumHeight')
+    assert hasattr(tree, 'listAllItems')
+
+    # Optional: manually clean up to avoid qtbot deletion issues
+    tree.close()
+    tree.deleteLater()
 
 
 def test_save(qtbot, tmp_path):
     ptree = ParameterEx()
-    ptree.settings_tree.show()
     qtbot.addWidget(ptree.settings_tree)
+    ptree.settings_tree.show()
 
     file_path = tmp_path.joinpath('settings.xml')
     ptree.save_settings_slot(file_path)
 
+    ptree.settings_tree.close()
+    ptree.settings_tree.deleteLater()
+
 
 def test_load(qtbot, tmp_path):
     ptree = ParameterEx()
-    ptree.settings_tree.show()
     qtbot.addWidget(ptree.settings_tree)
+    ptree.settings_tree.show()
 
     file_path = tmp_path.joinpath('settings.xml')
     ptree.save_settings_slot(file_path)
 
     parameter_copy = Parameter.create(name='settings', type='group', children=ParameterEx.params)
-    assert compareValuesParameter(ptree.settings, parameter_copy)
+    assert compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
 
     parameters = iter_children_params(ptree.settings, childlist=[])
     parameters_copy = iter_children_params(parameter_copy, childlist=[])
@@ -86,7 +99,7 @@ def test_load(qtbot, tmp_path):
             elif 'tabular_table' == parameter.opts['type']:
                 parameter.setValue(TableModel([[0.5, 0.2, 0.6]], ['value20', 'val2', '555']))
 
-    assert not compareValuesParameter(ptree.settings, parameter_copy)
+    assert not compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
     assert compareStructureParameter(ptree.settings, parameter_copy)
 
     ptree.update_settings_slot(file_path)
@@ -96,5 +109,8 @@ def test_load(qtbot, tmp_path):
         if parameter.value() != pcopy.value():
             print(parameter)
 
-    assert compareValuesParameter(ptree.settings, parameter_copy)
+    assert compareValuesParameter(ptree.settings, parameter_copy, with_self=False)
     assert compareStructureParameter(ptree.settings, parameter_copy)
+
+    ptree.settings_tree.close()
+    ptree.settings_tree.deleteLater()

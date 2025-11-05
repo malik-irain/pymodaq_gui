@@ -1,6 +1,6 @@
 from qtpy import API_NAME
 
-if API_NAME.lower() == 'pyqt5':
+if API_NAME.lower()in ['pyqt5', 'pyqt6']:
     from qtpy.QtCore import QVariant
 else:
     def QVariant(*args):

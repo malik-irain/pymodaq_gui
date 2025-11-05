@@ -100,19 +100,22 @@ class ROIFactory():
         return descriptors
 
 
-class ROIMixin(QtCore.QObject):
+class ROIMixin:
     index_signal = Signal(int)
 
     def __init__(self, index=0, name='roi', compute=True):
-        super().__init__()
         self.name = name
         self.index = index
         self._compute = compute
         self.menu = None
+        self.signalBlocker = None
+        self._clipboard = None
 
+    def init_qt(self):
         self.signalBlocker = QSignalBlocker(self)
         self.signalBlocker.unblock()
         self._clipboard = QtGui.QGuiApplication.clipboard()
+
 
     def emit_index_signal(self):
         self.index_signal.emit(self.index)
@@ -180,9 +183,11 @@ class ROI(pgROI, ROIMixin, ROIBase):
     sigRemoveRequested = Signal(object)
 
     def __init__(self, *args, index=0, name='roi', compute=True, **kwargs):
-        ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgROI.__init__(self, *args, **kwargs)
         ROIBase.__init__(self)
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
+
+        self.init_qt()
 
     def getMenu(self):
         if self.menu is None:
@@ -282,9 +287,11 @@ class LinearROI(pgLinearROI, ROIMixin, ROIBase):
     DESCRIPTOR = 'LinearROI'
 
     def __init__(self, index=0, pos=[0, 10], name = 'roi', compute=True, **kwargs):
-        ROIMixin.__init__(self, index=index, name=name, compute=compute)
         pgLinearROI.__init__(self, values=pos, **kwargs)
         ROIBase.__init__(self)
+        ROIMixin.__init__(self, index=index, name=name, compute=compute)
+
+        self.init_qt()
 
     def getMenu(self):
         if self.menu is None:
@@ -342,7 +349,6 @@ class LinearROI(pgLinearROI, ROIMixin, ROIBase):
     @property
     def color(self):
         return self.brush.color()
-
 
 @ROIFactory.register()
 class EllipseROI(ROI):

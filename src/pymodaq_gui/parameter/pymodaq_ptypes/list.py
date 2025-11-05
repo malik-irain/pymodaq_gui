@@ -5,8 +5,10 @@ from pyqtgraph.parametertree.Parameter import ParameterItem
 
 class Combo_pb(QtWidgets.QWidget):
 
-    def __init__(self, items=[]):
+    def __init__(self, items: list[str] = None):
         super(Combo_pb, self).__init__()
+        if items is None:
+            items = []
         self.items = items
         self.initUI()
         self.count = self.combo.count
@@ -30,9 +32,11 @@ class Combo_pb(QtWidgets.QWidget):
         self.add_pb.setMaximumWidth(25)
         self.setLayout(self.hor_layout)
         self.currentText = self.combo.currentText
+        self.currentTextChanged = self.combo.currentTextChanged
         self.setCurrentIndex = self.combo.setCurrentIndex
         self.clear = self.combo.clear
         self.addItem = self.combo.addItem
+        self.addItems = self.combo.addItems
         self.findText = self.combo.findText
 
 
