@@ -530,6 +530,15 @@ def XML_file_to_parameter(file_name: Union[str, Path]) -> list:
     params = walk_xml_to_parameter(params=[], XML_elt=root)
     return params
 
+def xml_file_to_parameter_dict(file_name: Union[str, Path]) -> dict:
+    tree = ET.parse(str(file_name))
+    root = tree.getroot()
+    param_dict = set_dict_from_el(root)
+    if len(root) > 0:
+        param_dict['children'] = walk_xml_to_parameter(params=[], XML_elt=root)
+
+    return param_dict
+
 
 def XML_string_to_parameter(xml_string):
     """ Convert a xml string into a list of dict for initialize pyqtgraph parameter object.
