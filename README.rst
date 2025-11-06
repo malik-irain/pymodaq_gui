@@ -1,3 +1,7 @@
+This repository has been **ARCHIVED** as we moved it into a MonoRepository together with PyMoDAQ and its side project: PymoDAq Data and Utils, please go to PyMoDAQ__ main repo to continue working on its development!
+
+__ https://github.com/PyMoDAQ/pymodaq
+
 PyMoDAQ GUI
 ###########
 
